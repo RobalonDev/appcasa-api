@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+*.tsbuildinfo
+
+# Environment (never commit secrets; .env.example is the documented template)
+.env
+.env.*
+!.env.example
+
+# Tests
+coverage/
+
+# Logs
+*.log
+logs/
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Claude Code local settings
+.claude/settings.local.json
