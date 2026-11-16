@@ -1,0 +1,22 @@
+# Architecture Decision Records (ADR)
+
+Un ADR documenta **una** decisión técnica relevante: qué problema había, qué opciones se valoraron, qué se eligió y qué consecuencias tiene. Sirven para que dentro de seis meses (o en una entrevista) se pueda explicar *por qué* el sistema es como es.
+
+## Reglas
+
+- Un fichero por decisión: `NNNN-titulo-en-kebab-case.md`, numeración correlativa.
+- Se escriben en español. Cortos: si ocupa más de una pantalla, probablemente son dos decisiones.
+- Un ADR aceptado **no se edita** para cambiar la decisión: se crea uno nuevo que lo sustituye y se marca el antiguo como `Sustituido por ADR-XXXX`.
+- Estados: `Propuesto` → `Aceptado` | `Rechazado`; más tarde, `Obsoleto` o `Sustituido por ADR-XXXX`.
+- Plantilla: [`0000-plantilla.md`](0000-plantilla.md).
+
+## Índice
+
+| ADR | Título | Estado |
+|---|---|---|
+| [0001](0001-registrar-decisiones-con-adrs.md) | Registrar decisiones de arquitectura con ADRs | Aceptado |
+| [0002](0002-stack-backend.md) | Stack backend: NestJS, Prisma y PostgreSQL | Aceptado |
+| [0003](0003-monolito-modular.md) | Empezar con un monolito modular | Aceptado |
+| [0004](0004-pnpm-como-gestor-de-paquetes.md) | pnpm como gestor de paquetes | Aceptado |
+| [0005](0005-autenticacion-propia.md) | Autenticación propia con JWT y refresh tokens | Aceptado |
+| [0006](0006-hogar-como-tenant.md) | El hogar como tenant; un usuario puede pertenecer a varios | Aceptado |
