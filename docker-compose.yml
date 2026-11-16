@@ -1,0 +1,36 @@
+# Local development infrastructure. The API itself runs on the host (`pnpm start:dev`)
+# for fast reloads; only the backing services live in containers.
+#
+# Usage:
+#   docker compose up -d      # start in background
+#   docker compose ps         # status (look for "healthy")
+#   docker compose logs -f    # follow logs
+#   docker compose down       # stop (data is kept in the named volume)
+#   docker compose down -v    # stop AND delete the data volume
+
+name: appcasa
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      # Values come from .env (Compose reads it automatically); defaults after ":-".
+      POSTGRES_USER: ${POSTGRES_USER:-appcasa}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-appcasa}
+      POSTGRES_DB: ${POSTGRES_DB:-appcasa}
+    ports:
+      # host:container. Bound to localhost only, so the DB isn't exposed to your network.
+      - '127.0.0.1:${POSTGRES_PORT:-5432}:5432'
+    volumes:
+      # Since Postgres 18 the image stores data under /var/lib/postgresql/<major>/,
+      # so the volume is mounted on the parent directory.
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  postgres-data:
