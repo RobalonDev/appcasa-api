@@ -18,6 +18,20 @@ Además de producto, es un **proyecto de aprendizaje**: el autor es desarrollado
 - **No añadir dependencias sin preguntar.** Fijar versiones estables (nunca RC/beta aunque npm las marque como `latest`). Nuevos scripts de instalación se aprueban explícitamente en `pnpm-workspace.yaml`.
 - **Antes de dar algo por terminado**, ejecutar `pnpm check` (y `pnpm test:e2e` si toca HTTP o base de datos).
 
+## Flujo de trabajo: Spec-Driven Development (ADR-0007)
+
+Las funcionalidades de dominio se especifican antes de programarse. El método completo está en la skill `sdd` (`.claude/skills/sdd/SKILL.md`).
+
+```
+/sdd-spec NNN-capacidad → /sdd-clarify NNN-capacidad → [aprobación] → plan + tareas → [aprobación] → implementación (1 tarea cada vez, tests primero) → validación
+```
+
+- **El autor redacta la spec y decide**; Claude entrevista, ofrece opciones con trade-offs, ayuda con la redacción y hace de QA. Nunca introduce reglas de negocio no decididas por el autor.
+- **No se pasa de fase sin aprobación explícita del autor.** La spec manda: lo que no está en ella no se implementa; si falta una decisión, se para y se pregunta.
+- Los cambios de requisitos entran primero por la spec, luego plan y tareas, por último código.
+- Los tests que cubren un requisito lo citan por su id: `it('RF-3: …')`.
+- **No aplica** a infraestructura o decisiones transversales (→ ADR) ni a cambios pequeños (→ rama + PR).
+
 ## Comandos
 
 ```bash
@@ -51,7 +65,10 @@ src/
 prisma/schema.prisma  modelos y migraciones (prisma/migrations)
 test/                 tests e2e
 docs/adr/             Architecture Decision Records
+docs/specs/           specs SDD (NNN-capacidad/{spec,plan,tasks}.md) y plantillas
 docs/STATUS.md        estado del proyecto y errores a evitar (memoria de trabajo)
+.claude/skills/       método SDD (sdd) y comandos /sdd-*
+.claude/agents/       subagente reviewer (solo lectura)
 ```
 
 ## Convenciones

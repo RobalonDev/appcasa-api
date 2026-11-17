@@ -20,3 +20,4 @@ Un ADR documenta **una** decisión técnica relevante: qué problema había, qu�
 | [0004](0004-pnpm-como-gestor-de-paquetes.md) | pnpm como gestor de paquetes | Aceptado |
 | [0005](0005-autenticacion-propia.md) | Autenticación propia con JWT y refresh tokens | Aceptado |
 | [0006](0006-hogar-como-tenant.md) | El hogar como tenant; un usuario puede pertenecer a varios | Aceptado |
+| [0007](0007-spec-driven-development.md) | Spec-Driven Development ligero para funcionalidades de dominio | Aceptado |

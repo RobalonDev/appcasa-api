@@ -6,11 +6,13 @@
 ## Estado actual
 
 - Fase 0 (base) completada el 2026-11-16. CI en verde.
-- Siguiente: **fase 1 — identidad y hogares**. Empezar por el diseño (modelo de datos, flujo de auth, invitaciones) y su ADR, antes del código.
+- SDD ligero adoptado el 2026-11-17 (ADR-0007). Disponibles `/sdd-spec` y `/sdd-clarify`; el resto de comandos se crean al llegar a cada fase.
+- Fase en curso: **fase 1 — identidad y hogares**.
+- Spec activa: ninguna. Siguiente: `/sdd-spec 001-…` (decidir con el autor cómo partir la fase 1 en specs).
 
 ## Decisiones clave
 
-Ver `docs/adr/`. Resumen: NestJS 12 + Prisma 7 + Postgres 18 (0002), monolito modular (0003), pnpm (0004), auth propia (0005), hogar como tenant (0006).
+Ver `docs/adr/`. Resumen: NestJS 12 + Prisma 7 + Postgres 18 (0002), monolito modular (0003), pnpm (0004), auth propia (0005), hogar como tenant (0006), SDD ligero (0007).
 
 ## Errores a evitar
 
