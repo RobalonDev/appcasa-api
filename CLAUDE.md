@@ -2,6 +2,8 @@
 
 @AGENTS.md
 
+@docs/STATUS.md
+
 ## Proyecto
 
 AppCasa: backend de un gestor del hogar (miembros de un hogar, tareas, gastos compartidos, listas de la compra). Solo backend; el frontend (web + móvil) irá en otro repo y consumirá esta API.
@@ -49,6 +51,7 @@ src/
 prisma/schema.prisma  modelos y migraciones (prisma/migrations)
 test/                 tests e2e
 docs/adr/             Architecture Decision Records
+docs/STATUS.md        estado del proyecto y errores a evitar (memoria de trabajo)
 ```
 
 ## Convenciones
@@ -65,7 +68,9 @@ docs/adr/             Architecture Decision Records
 
 ## Hoja de ruta
 
-0. Base del proyecto ← **actual**
+La fase en curso se indica en `docs/STATUS.md`.
+
+0. Base del proyecto
 1. Identidad y hogares: auth (JWT + refresh), membresías, invitaciones, roles
 2. Tareas: recurrencia, asignación, rotación, jobs programados
 3. Gastos compartidos: repartos, saldos, liquidaciones, idempotencia
@@ -73,3 +78,15 @@ docs/adr/             Architecture Decision Records
 5. Notificaciones: eventos de dominio, outbox, colas (BullMQ), worker
 6. Producción: observabilidad, rate limiting, caché, despliegue
 7. Opcional: extracción de servicios, mensajería, sagas
+
+## Memoria
+
+- `docs/STATUS.md` es la memoria de trabajo del proyecto y se carga automáticamente
+  (import al inicio de este fichero).
+- Al terminar una tarea, actualízalo: estado actual, decisiones importantes y errores a
+  evitar. Las decisiones con su porqué van en un ADR; en `STATUS.md` solo se enlazan.
+- Mantenlo breve (máximo ~50 líneas): resume o elimina lo que ya no aporte.
+- Si algo se convierte en una regla permanente, propón moverlo a `CLAUDE.md` en lugar de
+  dejarlo en la memoria.
+- El repo es público: no guardes nunca datos sensibles (claves, tokens, datos personales).
+  Las preferencias personales del autor van en la memoria privada de Claude, no aquí.
