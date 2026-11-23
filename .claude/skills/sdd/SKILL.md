@@ -40,6 +40,9 @@ Mientras un comando no exista, la fase se hace en conversación siguiendo estas 
 6. **Trazabilidad:** cada test que cubre un requisito lo nombra por su id, p. ej. `it('RF-3: rejects an expired invitation')`.
 7. **Estado del proyecto:** `docs/STATUS.md` apunta a la spec activa pero no copia su progreso; el avance de tareas vive solo en `tasks.md`.
 8. **Criterio de parada de `/sdd-clarify`:** tras resolver una revisión se lanza otra. Si solo quedan detalles de implementación o de redacción menor (no contradicciones, ni huecos de comportamiento, ni riesgos de seguridad), se mueven a «Notas para el plan» o se aceptan, y el autor puede aprobar la spec. Un reviewer exigente siempre encuentra algo: no se itera hasta el veredicto limpio. Antes de actuar sobre un hallazgo, se comprueba (los revisores también se equivocan).
+9. **Spec o plan:** si un test necesita saberlo, va en la spec; si es el *cómo*, va en el plan (o en «Notas para el plan» de la spec).
+10. **Pasada de coherencia:** tras cada lote de cambios en una spec, Claude busca cada término, id y cifra que ha tocado y comprueba que el resto del documento (definiciones, decisiones, casos límite, RNF) sigue diciendo lo mismo, antes de pasarla al reviewer. En la spec 001, dos correcciones introdujeron contradicciones nuevas por no hacerlo.
+11. **Tamaño:** objetivo orientativo de 15 RF por spec como máximo. Si la entrevista lo supera, Claude propone dividirla en ese momento, no al planificar.
 
 ## spec.md: QUÉ y POR QUÉ
 
