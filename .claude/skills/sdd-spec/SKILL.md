@@ -1,6 +1,6 @@
 ---
 name: sdd-spec
-description: Start or continue a feature spec (docs/specs/NNN-capacidad/spec.md) by interviewing the author. The author decides; Claude asks, offers options and helps with wording.
+description: Start or continue a feature spec (docs/specs/NNN-capacidad/spec.md) by interviewing the author. The author decides and reviews; Claude asks, offers options and drafts the requirements.
 disable-model-invocation: true
 argument-hint: <NNN-capacidad> [idea]
 ---
@@ -21,7 +21,7 @@ Spec: `docs/specs/$spec/spec.md`.
    - explica por qué importa (qué se rompe si no se decide);
    - ofrece 2–3 opciones con sus trade-offs y, si tienes una recomendación, dila;
    - espera la respuesta: **la decisión es del autor**.
-4. **Redactar con el autor.** Tras cada decisión, pide al autor que escriba el requisito en EARS. Si se atasca o lo pide, propón tú la redacción y pídele que la confirme o la corrija. Señala cuando un RF no sea verificable o mezcle dos comportamientos.
+4. **Redactar para que el autor revise.** Tras cada decisión (o al cerrar la ronda), redacta tú los requisitos en EARS y preséntalos al autor indicando qué revisar en cada uno: qué hueco cierra cada parte y qué pasaría si se quitara. El autor los confirma o corrige. Si el autor quiere escribir alguno él mismo, dale el patrón y revísalo. Señala cuando un RF no sea verificable o mezcle dos comportamientos, y busca huecos que aparezcan al combinar requisitos.
 5. **No inventar.** No añadas reglas de negocio que el autor no haya decidido. Lo pendiente va a "Dudas abiertas" como `[NECESITA ACLARACIÓN]`.
 6. **Cerrar la ronda.** Guarda los cambios en `spec.md` y resume: qué quedó decidido, qué dudas siguen abiertas y si conviene otra ronda o pasar a `/sdd-clarify $spec`.
 

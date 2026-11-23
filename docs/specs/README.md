@@ -6,7 +6,7 @@ Cada funcionalidad de dominio se especifica antes de programarse. Motivos y alca
 
 ```
 docs/specs/NNN-capacidad/
-  spec.md    QUÉ y POR QUÉ (lo redacta el autor)
+  spec.md    QUÉ y POR QUÉ (la redacta Claude; decide y revisa el autor)
   plan.md    CÓMO: diseño, contrato de API, consistencia, decisiones
   tasks.md   ≤10 tareas con su responsable y su criterio de "hecho"
 ```

@@ -35,7 +35,7 @@ Mientras un comando no exista, la fase se hace en conversación siguiendo estas 
 1. **No se pasa de fase sin aprobación explícita del autor.** Solo el autor cambia el estado de una spec a `aprobada`.
 2. **La spec manda.** Lo que no está en la spec no se implementa. Si falta una decisión, se para y se pregunta.
 3. **Los cambios entran por arriba:** primero spec, luego plan y tareas, por último código.
-4. **El autor decide; Claude ayuda.** En la spec, Claude pregunta, ofrece opciones con trade-offs y propone redacciones, pero no introduce reglas de negocio que el autor no haya decidido. Una decisión pendiente se marca `[NECESITA ACLARACIÓN]`.
+4. **El autor decide y revisa; Claude redacta.** En la spec, Claude pregunta y ofrece opciones con trade-offs; tras cada decisión redacta el requisito, explica qué conviene revisar (qué hueco cierra cada parte) y el autor lo confirma o corrige. Claude no introduce reglas de negocio que el autor no haya decidido: una decisión pendiente se marca `[NECESITA ACLARACIÓN]`. (Desde 2026-11-23; antes redactaba el autor. Variante prevista en ADR-0007.)
 5. **Una tarea cada vez:** tests primero (en rojo), código hasta verde, marcar `[x]`, parar.
 6. **Trazabilidad:** cada test que cubre un requisito lo nombra por su id, p. ej. `it('RF-3: rejects an expired invitation')`.
 7. **Estado del proyecto:** `docs/STATUS.md` apunta a la spec activa pero no copia su progreso; el avance de tareas vive solo en `tasks.md`.
