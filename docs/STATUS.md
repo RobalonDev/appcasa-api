@@ -8,7 +8,8 @@
 - Fase 0 (base) completada el 2026-11-16. CI en verde.
 - SDD ligero adoptado el 2026-11-17 (ADR-0007). Disponibles `/sdd-spec` y `/sdd-clarify`; el resto de comandos se crean al llegar a cada fase.
 - Fase en curso: **fase 1 — identidad y hogares**.
-- Spec activa: ninguna. Siguiente: `/sdd-spec 001-…` (decidir con el autor cómo partir la fase 1 en specs).
+- Fase 1 dividida en specs: 001-authentication → 002-households → 003-invitations.
+- Spec activa: **001-authentication** (borrador, ronda 1 cerrada; rama `feat/001-authentication`). Siguiente: ronda 2 de `/sdd-spec` sobre sus dudas abiertas.
 
 ## Decisiones clave
 

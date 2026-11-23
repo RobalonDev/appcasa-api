@@ -17,4 +17,4 @@ Plantillas en [`_templates/`](_templates/). Las specs se nombran por capacidad (
 
 | Spec | Capacidad | Estado |
 |---|---|---|
-| — | — | — |
+| [001](001-authentication/spec.md) | Autenticación | borrador |
