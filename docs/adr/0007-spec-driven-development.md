@@ -36,3 +36,10 @@ Opción 4:
 - Más tiempo antes de la primera línea de código de cada funcionalidad.
 - Riesgo de ceremonia: si una fase no aporta, se simplifica en lugar de seguirla por inercia.
 - Revisar tras la spec 001 y tras la fase 1: qué fases sobran o faltan, y si merece la pena probar el modo orquestado (es, en pequeño, un problema de sistemas distribuidos: qué contexto viaja en cada mensaje).
+
+## Seguimiento
+
+Notas añadidas después de aceptar el ADR. No cambian la decisión: registran cómo se ha aplicado.
+
+- **2026-11-23, redacción.** Se activa la variante prevista: Claude redacta los requisitos tras cada decisión y explica qué revisar; el autor decide, revisa y corrige. Motivo: en la práctica el autor pedía la redacción casi siempre, y revisar críticamente también entrena el criterio.
+- **2026-11-23, criterio de parada de `/sdd-clarify`.** Tras resolver una revisión se lanza otra; si solo quedan detalles de implementación o de redacción menor, van a «Notas para el plan» o se aceptan, y el autor aprueba la spec. Motivo: la spec 001 pasó de 12 problemas en la primera revisión a 7, casi todos detalles, en la segunda; sin criterio se pulirían detalles indefinidamente. Recogido como regla 8 de la skill `sdd`.

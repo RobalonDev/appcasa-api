@@ -39,6 +39,7 @@ Mientras un comando no exista, la fase se hace en conversación siguiendo estas 
 5. **Una tarea cada vez:** tests primero (en rojo), código hasta verde, marcar `[x]`, parar.
 6. **Trazabilidad:** cada test que cubre un requisito lo nombra por su id, p. ej. `it('RF-3: rejects an expired invitation')`.
 7. **Estado del proyecto:** `docs/STATUS.md` apunta a la spec activa pero no copia su progreso; el avance de tareas vive solo en `tasks.md`.
+8. **Criterio de parada de `/sdd-clarify`:** tras resolver una revisión se lanza otra. Si solo quedan detalles de implementación o de redacción menor (no contradicciones, ni huecos de comportamiento, ni riesgos de seguridad), se mueven a «Notas para el plan» o se aceptan, y el autor puede aprobar la spec. Un reviewer exigente siempre encuentra algo: no se itera hasta el veredicto limpio. Antes de actuar sobre un hallazgo, se comprueba (los revisores también se equivocan).
 
 ## spec.md: QUÉ y POR QUÉ
 
