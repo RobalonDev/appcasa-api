@@ -10,7 +10,7 @@
 - Fase en curso: **fase 1 — identidad y hogares**.
 - Fase 1 dividida en specs: 001-authentication → 002-households → 003-invitations; además 004-account-management (recuperación/cambio de contraseña, nombre, borrado) antes de desplegar.
 - Desde 2026-11-23 Claude redacta los requisitos y el autor decide y revisa (variante prevista en ADR-0007).
-- Spec activa: **001-authentication** (borrador, ronda 3 cerrada; rama `feat/001-authentication`). Siguiente: ronda 4 (corta) de `/sdd-spec`, después `/sdd-clarify`.
+- Spec activa: **001-authentication** (borrador, entrevista completa; rama `feat/001-authentication`). Siguiente: `/sdd-clarify 001-authentication`.
 
 ## Decisiones clave
 
