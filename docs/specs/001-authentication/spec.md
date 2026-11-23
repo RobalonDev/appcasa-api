@@ -3,7 +3,7 @@
 - **Estado:** borrador <!-- borrador | aprobada | implementada -->
 - **Fecha:** 2026-11-23
 - **ADRs relacionados:** [0005](../../adr/0005-autenticacion-propia.md), [0006](../../adr/0006-hogar-como-tenant.md)
-- **Ronda de entrevista:** 2 cerrada. Los elementos marcados _(propuesto)_ los redactó Claude y están pendientes de confirmación del autor.
+- **Ronda de entrevista:** 3 cerrada. Los elementos marcados _(propuesto)_ están pendientes de confirmación del autor.
 
 <!--
 Solo QUÉ y POR QUÉ. Nada de tecnología, tablas, endpoints ni nombres de ficheros: eso va en plan.md.
@@ -34,6 +34,11 @@ El sistema **deniega por defecto**: toda operación requiere una sesión válida
 | D3 | Máximo 10 intentos fallidos de verificación por cuenta en 24 horas, sumando todos sus códigos. | Con D1d y D2, un atacante insistente aún podía probar unos 600 códigos al día (≈20 % de acertar en un año). Con el tope, ≈1 entre 100.000 al día. Se acepta que un usuario legítimo bloqueado no lo sepa (principio de no enumeración). |
 | D4 | Cada dispositivo tiene su propia sesión; cerrar sesión afecta solo al actual, y existe «cerrar sesión en todos los dispositivos». | El caso de uso es web y móvil a la vez, y quien pierde el móvil debe poder echar a ese dispositivo sin tenerlo. |
 | D5 | Una sesión caduca tras 30 días sin uso y, en cualquier caso, a los 90 días de iniciarse. | Equilibrio entre comodidad en móvil (unos 4 inicios de sesión al año para un uso diario) y la vida máxima de una sesión robada. |
+| D6 | Tras 5 intentos fallidos de inicio de sesión con un mismo email en 15 minutos, se rechazan los intentos con ese email durante 15 minutos, también con la contraseña correcta, con el mismo mensaje genérico y aunque el email no exista. | Frena la fuerza bruta (≈480 intentos al día como máximo) y limita a 15 minutos el bloqueo malicioso. Bloquear hasta que el dueño desbloquee permitiría dejar sin acceso a cualquiera; limitar solo por IP no frena ataques distribuidos. |
+| D7 | La recuperación y el cambio de contraseña quedan fuera de esta spec y van a la spec 004 (gestión de cuenta), antes de desplegar. | Son flujos propios y esta spec ya tiene un tamaño considerable. |
+| D8 | La contraseña tiene entre 12 y 128 caracteres, admite cualquier carácter, no tiene reglas de composición y no puede ser una contraseña filtrada conocida. | Las reglas de composición no aportan seguridad real (la gente pone «Password1!»; NIST SP 800-63B las desaconseja). La longitud y el rechazo de contraseñas filtradas sí la aportan. |
+| D9 | Los emails no distinguen mayúsculas de minúsculas y se ignoran los espacios al principio y al final; los alias no se unifican. | Evita cuentas duplicadas y fallos de inicio de sesión. Unificar alias depende de cada proveedor y confunde a quien los usa a propósito. |
+| D10 | Al registrarse se pide un nombre visible obligatorio. Editarlo y borrar la cuenta van a la spec 004. | Los miembros de un hogar se verán entre sí y el email no debe exponerse. El borrado depende de qué pase con los datos compartidos (hogares, gastos), que aún no existen. |
 
 ## Usuarios
 
@@ -51,10 +56,11 @@ _(propuesto)_
 - **Código de verificación:** código que el sistema envía al email de una cuenta pendiente para demostrar que quien se registró controla ese email.
 - **Sesión:** acceso autenticado de un usuario desde un dispositivo concreto, desde que inicia sesión hasta que la cierra o caduca.
 - **Email de autenticación:** cualquier email que el sistema envía como parte de esta spec (código de verificación o aviso de intento de registro).
+- **Nombre visible:** nombre con el que los demás miembros de un hogar identifican al usuario.
 
 ## Historias de usuario
 
-- **HU-1** _(propuesto)_. Como persona sin cuenta, quiero registrarme con mi email y una contraseña para usar AppCasa.
+- **HU-1** _(propuesto)_. Como persona sin cuenta, quiero registrarme con mi email, mi nombre y una contraseña para usar AppCasa.
 - **HU-2** _(propuesto)_. Como usuario con la cuenta pendiente, quiero verificar mi email con un código para activar mi cuenta.
 - **HU-3.** Como usuario con cuenta activa, quiero iniciar y cerrar sesión en mis dispositivos para usar AppCasa y proteger mi cuenta si pierdo uno.
 
@@ -66,6 +72,10 @@ _(propuesto)_
 - **RF-6** (HU-1). SI alguien se registra con un email que ya tiene cuenta, ENTONCES EL SISTEMA responde exactamente igual que a un registro nuevo.
 - **RF-7** (HU-1). CUANDO alguien se registra con el email de una cuenta activa, EL SISTEMA envía al dueño de ese email un aviso de intento de registro.
 - **RF-8** (HU-1). CUANDO alguien se registra con el email de una cuenta pendiente, EL SISTEMA reenvía un código de verificación a ese email.
+- **RF-23** (HU-1). SI alguien se registra con una contraseña de menos de 12 o más de 128 caracteres, ENTONCES EL SISTEMA rechaza el registro e indica los requisitos de la contraseña.
+- **RF-24** (HU-1). SI alguien se registra con una contraseña que figura en una lista de contraseñas filtradas conocidas, ENTONCES EL SISTEMA rechaza el registro e indica que la contraseña no es segura.
+- **RF-25** (HU-1). EL SISTEMA admite en la contraseña cualquier carácter, incluidos los espacios, sin exigir combinaciones de tipos de caracteres.
+- **RF-27** (HU-1). SI alguien se registra sin un nombre visible, ENTONCES EL SISTEMA rechaza el registro.
 
 ### Verificación del email
 
@@ -83,6 +93,10 @@ _(propuesto)_
 
 - **RF-12** (HU-1, HU-2). SI un email de autenticación a una dirección superaría el límite de 1 por minuto o 5 por hora, ENTONCES EL SISTEMA no lo envía y responde igual que si lo hubiera enviado.
 
+### Formato del email
+
+- **RF-26** (HU-1, HU-3). EL SISTEMA trata como el mismo email dos direcciones que solo se diferencian en mayúsculas y minúsculas o en espacios al principio o al final.
+
 ### Inicio y cierre de sesión
 
 - **RF-2** (HU-2). SI un usuario intenta iniciar sesión con credenciales correctas y su cuenta está pendiente de verificación, ENTONCES EL SISTEMA deniega el acceso e indica que debe verificar su email.
@@ -92,6 +106,7 @@ _(propuesto)_
 - **RF-19** (HU-3). CUANDO un usuario cierra sesión en todos los dispositivos, EL SISTEMA finaliza todas sus sesiones.
 - **RF-20** (HU-3). SI una sesión lleva 30 días sin usarse, ENTONCES EL SISTEMA la finaliza.
 - **RF-21** (HU-3). SI han pasado 90 días desde que se inició una sesión, ENTONCES EL SISTEMA la finaliza aunque se haya seguido usando.
+- **RF-22** (HU-3). SI se producen 5 intentos fallidos de inicio de sesión con un mismo email en 15 minutos, ENTONCES EL SISTEMA rechaza todo intento de inicio de sesión con ese email durante los 15 minutos siguientes, con el mismo mensaje genérico de RF-13, incluso con la contraseña correcta y aunque el email no tenga cuenta.
 
 ## Requisitos no funcionales
 
@@ -105,12 +120,15 @@ _(propuesto)_
 - Código caducado, agotado por intentos fallidos o sustituido por uno nuevo: RF-9, RF-10, RF-11.
 - Fuerza bruta acumulada pidiendo códigos nuevos una y otra vez: RF-15, RF-16.
 - Dispositivo perdido o robado: RF-19.
-- Resto de casos límite: pendiente de la ronda 3 (ver dudas abiertas).
+- Fuerza bruta en el inicio de sesión, y bloqueo malicioso de la cuenta de otra persona: RF-22 (como mucho 15 minutos seguidos).
+- El mismo email escrito con distintas mayúsculas o con espacios: RF-26.
+- Resto de casos límite: pendiente de la ronda 4 (ver dudas abiertas).
 
 ## Fuera de alcance
 
 - Pertenencia a hogares, membresías y roles: spec 002.
 - Invitaciones a hogares: spec 003.
+- Recuperación y cambio de contraseña, edición del nombre visible y borrado de cuenta: spec 004 (gestión de cuenta), antes de desplegar.
 - Interfaz de usuario (pantallas, navegación, redirecciones): la decide cada cliente; esta spec define el comportamiento de la API.
 
 ## Criterios de finalización
@@ -124,10 +142,7 @@ _(propuesto)_
 La spec no puede pasar a `aprobada` con dudas abiertas.
 
 - [NECESITA ACLARACIÓN] **Confirmación** de HU-1, HU-2 y las definiciones.
-- [NECESITA ACLARACIÓN] **Fuerza bruta en el inicio de sesión:** ¿bloqueo de la cuenta, limitación de intentos o ambos?
-- [NECESITA ACLARACIÓN] **Recuperación de contraseña:** ¿dentro o fuera de alcance? Si entra: ¿cambiar la contraseña cierra todas las sesiones?
-- [NECESITA ACLARACIÓN] **Requisitos de la contraseña:** longitud mínima, rechazo de contraseñas comprometidas…
-- [NECESITA ACLARACIÓN] **Perfil y borrado:** ¿qué datos mínimos tiene una cuenta (p. ej. un nombre visible para los demás miembros del hogar)? ¿Se puede borrar la cuenta en esta spec?
 - [NECESITA ACLARACIÓN] **Cuentas pendientes abandonadas:** ¿una cuenta que nunca se verifica caduca o se elimina?
-- [NECESITA ACLARACIÓN] **Formato del email:** ¿`Ana@Ejemplo.com` y `ana@ejemplo.com` son la misma cuenta?
 - [NECESITA ACLARACIÓN] **Rol de plataforma** (superadministrador de AppCasa): previsiblemente fuera de alcance; confirmar.
+- [NECESITA ACLARACIÓN] **Nombre visible:** ¿longitud mínima y máxima?
+- [NECESITA ACLARACIÓN] **Tamaño de la spec:** con 27 RF, ¿se divide antes del plan (p. ej. registro y verificación por un lado, sesiones por otro)?
