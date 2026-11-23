@@ -1,9 +1,9 @@
 # Spec 001: Autenticación
 
-- **Estado:** borrador <!-- borrador | aprobada | implementada -->
+- **Estado:** aprobada <!-- borrador | aprobada | implementada -->
 - **Fecha:** 2026-11-23
 - **ADRs relacionados:** [0005](../../adr/0005-autenticacion-propia.md), [0006](../../adr/0006-hogar-como-tenant.md)
-- **Entrevista:** completa (4 rondas). **Revisiones de `/sdd-clarify`:** 1 a 3 resueltas. Siguiente paso: revisión 4, con el criterio de parada de la skill `sdd` (regla 8).
+- **Entrevista:** 4 rondas. **Revisiones de `/sdd-clarify`:** 4 (12 → 7 → 3 → 1 problemas). **Aprobada por el autor** el 2026-11-23 aplicando la regla 8 de `sdd`. Siguiente paso: plan.
 
 <!--
 Solo QUÉ y POR QUÉ. Nada de tecnología, tablas, endpoints ni nombres de ficheros: eso va en plan.md.
@@ -153,6 +153,7 @@ El sistema **deniega por defecto**: toda operación requiere una sesión válida
   - Solicitar el registro: email sin cuenta, email con cuenta.
   - Completar el registro: email con cuenta, email sin registro en curso, email con registro en curso y código erróneo.
   - Iniciar sesión: email sin cuenta, email con cuenta y contraseña errónea.
+  - El umbral se cumple también cuando se aplica un límite o un bloqueo (RF-12, RF-15, RF-42): que se envíe o no un email no puede alterar el tiempo de respuesta.
   - El autor asume que un atacante con muchas más muestras podría detectar diferencias menores («en la práctica», principio de no enumeración).
 - **RNF-3.** Los límites de RF-10, RF-12, RF-15 y RF-22 se cumplen con exactitud aunque lleguen peticiones simultáneas: en ningún caso se aceptan más intentos ni se envían más emails de los indicados.
 - **RNF-4.** Una sesión finalizada (RF-18 a RF-21 y RF-36) deja de permitir cualquier operación en un plazo máximo de 5 minutos.
@@ -212,6 +213,13 @@ Decisiones de *cómo* que salieron en la revisión y no pertenecen a la spec:
 - Cómo se mide el último uso de una sesión con el diseño de ADR-0005 (RF-20).
 - Comparación sin distinguir mayúsculas en emails con caracteres no ASCII (RF-26): reglas estándar de Unicode.
 - Qué validación de formato de email se usa (RF-35) y cómo trata los casos frontera (direcciones sin punto en el dominio, comillas, dominios internacionalizados).
+- Cómo se cumple RNF-2 en los estados de límite o bloqueo: el tiempo de respuesta no puede depender de si se envía un email (p. ej., envío asíncrono).
+
+Observaciones de la revisión 4 que se resuelven al planificar (regla 8):
+
+- Qué ocurre al completar el registro de un email bloqueado por RF-22 (¿se crea la cuenta y la sesión?), dado que RF-22 habla de inicios de sesión.
+- Definir «emitir» un código (¿desde que se genera o desde que se acepta su envío?, relevante para los 15 minutos de RF-9 y para el envío de resultado incierto) y unificar «vigente» y «válido».
+- Si el tabulador al principio o al final del nombre visible se elimina como espacio en blanco o se rechaza como carácter de control (RF-26, RF-27, RF-35 y D13 usan «espacios» de forma distinta).
 - D14: si el plan sale con más de 10 tareas, decidir cómo dividir el trabajo.
 
 ## Dudas abiertas
