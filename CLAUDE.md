@@ -80,7 +80,7 @@ docs/STATUS.md        estado del proyecto y errores a evitar (memoria de trabajo
 - **Configuración:** toda variable de entorno nueva se añade a `src/config/env.ts` y a `.env.example`. Se lee con `ConfigService<Env, true>` y `get('X', { infer: true })`, nunca con `process.env` directamente en la app.
 - **Base de datos:** cambios de esquema solo mediante migraciones de Prisma. Nunca editar una migración ya aplicada; crear una nueva.
 - **Arquitectura (ADR-0003):** un módulo Nest por bounded context. Un módulo no accede a tablas ni providers internos de otro: usa su servicio exportado o sus eventos.
-- **Multi-tenancy (ADR-0006):** todo dato de dominio pertenece a un hogar (`householdId`) y toda operación verifica la membresía del usuario en ese hogar.
+- **Multi-tenancy (ADR-0006):** todo dato de dominio pertenece a un hogar (`householdId`) y toda operación verifica la membresía del usuario en ese hogar. Excepción: la identidad (cuentas y sesiones, spec 001) es global y no pertenece a ningún hogar.
 - **Tests:** unitarios junto al código (`*.spec.ts`), e2e en `test/`. Lógica de dominio siempre con tests.
 
 ## Hoja de ruta

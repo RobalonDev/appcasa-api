@@ -62,7 +62,7 @@ Lo que explícitamente NO hace esta spec, para que nadie lo implemente "de paso"
 
 - Todos los RF y RNF tienen al menos un test que los referencia por su id (`RF-n`) y está en verde.
 - `pnpm check` y `pnpm test:e2e` en verde.
-- El reviewer da `VEREDICTO: APROBADO`.
+- El reviewer da `VEREDICTO: APROBADO` en `/sdd-validate` (en `/sdd-clarify` el veredicto es `LISTA PARA APROBAR`).
 
 ## Dudas abiertas
 
