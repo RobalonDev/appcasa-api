@@ -3,7 +3,7 @@
 - **Estado:** borrador <!-- borrador | aprobada | implementada -->
 - **Fecha:** 2026-11-23
 - **ADRs relacionados:** [0005](../../adr/0005-autenticacion-propia.md), [0006](../../adr/0006-hogar-como-tenant.md)
-- **Entrevista:** completa (4 rondas). **Revisiones de `/sdd-clarify`:** 1 y 2 resueltas. Siguiente paso: revisión 3, con el criterio de parada de la skill `sdd` (regla 8).
+- **Entrevista:** completa (4 rondas). **Revisiones de `/sdd-clarify`:** 1 a 3 resueltas. Siguiente paso: revisión 4, con el criterio de parada de la skill `sdd` (regla 8).
 
 <!--
 Solo QUÉ y POR QUÉ. Nada de tecnología, tablas, endpoints ni nombres de ficheros: eso va en plan.md.
@@ -22,7 +22,7 @@ El sistema **deniega por defecto**: toda operación requiere una sesión válida
 
 **Principio de no enumeración:** ninguna operación pública (solicitar el registro, completarlo, iniciar sesión) permite averiguar en la práctica si un email tiene cuenta a quien no conoce su contraseña: ni por el mensaje ni por el tiempo de respuesta (umbral medible en RNF-2).
 
-**Regla de precedencia:** cuando se aplica un límite o un bloqueo (RF-12, RF-15, RF-22) o un rechazo por datos no válidos (RF-23, RF-24, RF-27, RF-35), prevalece sobre los requisitos del flujo normal (RF-1, RF-4, RF-7, RF-17). Por ejemplo, durante el bloqueo de RF-15 una solicitud de registro se responde igual, pero ningún código permite completar el registro.
+**Regla de precedencia:** cuando se aplica un límite o un bloqueo (RF-12, RF-15, RF-22) o un rechazo por datos no válidos (RF-23, RF-24, RF-27, RF-35), prevalece sobre los requisitos del flujo normal (RF-1, RF-4, RF-7, RF-17). Por ejemplo, durante el bloqueo de RF-15 una solicitud de registro se responde igual, pero no se emite ni se envía ningún código (RF-42) y ningún código permite completar el registro.
 
 ### Decisiones del autor y su porqué
 
@@ -38,7 +38,7 @@ El sistema **deniega por defecto**: toda operación requiere una sesión válida
 | D3 | Máximo 10 intentos fallidos de verificación por email en 24 horas, sumando todos sus códigos. | Con D1d y D2, un atacante insistente aún podía probar unos 600 códigos al día (≈20 % de acertar en un año). Con el tope, ≈1 entre 100.000 al día. Se acepta que una persona bloqueada no lo sepa (principio de no enumeración). |
 | D4 | Cada inicio de sesión tiene su propia sesión; cerrar sesión afecta solo a esa, y existe «cerrar sesión en todos los dispositivos». | El caso de uso es web y móvil a la vez, y quien pierde el móvil debe poder echar a ese dispositivo sin tenerlo. |
 | D5 | Una sesión caduca tras 30 días sin uso y, en cualquier caso, a los 90 días de iniciarse. | Equilibrio entre comodidad en móvil (unos 4 inicios de sesión al año para un uso diario) y la vida máxima de una sesión robada. |
-| D6 | Tras 5 intentos fallidos de inicio de sesión con un mismo email en 15 minutos, se rechazan los intentos con ese email durante 15 minutos, también con la contraseña correcta, con el mismo mensaje genérico y aunque el email no exista. | Frena la fuerza bruta (≈480 intentos al día como máximo). Bloquear hasta que el dueño desbloquee permitiría dejar sin acceso a cualquiera con muy poco esfuerzo; limitar solo por IP no frena ataques distribuidos. |
+| D6 | Tras 5 intentos fallidos de inicio de sesión con un mismo email en 15 minutos, se rechazan los intentos con ese email durante 15 minutos, también con la contraseña correcta, con el mismo mensaje genérico y aunque el email no exista. Un inicio de sesión correcto reinicia la cuenta de fallos. | Frena la fuerza bruta (≈480 intentos al día como máximo). Bloquear hasta que el dueño desbloquee permitiría dejar sin acceso a cualquiera con muy poco esfuerzo; limitar solo por IP no frena ataques distribuidos. |
 | D7 | La recuperación y el cambio de contraseña quedan fuera de esta spec y van a la spec 004 (gestión de cuenta), antes de desplegar. | Son flujos propios y esta spec ya tiene un tamaño considerable. |
 | D8 | La contraseña tiene entre 12 y 128 caracteres, admite cualquier carácter, no tiene reglas de composición y no puede ser una contraseña filtrada conocida. | Las reglas de composición no aportan seguridad real (la gente pone «Password1!»; NIST SP 800-63B las desaconseja). La longitud y el rechazo de contraseñas filtradas sí la aportan. |
 | D9 | Los emails no distinguen mayúsculas de minúsculas y se ignoran los espacios al principio y al final; los alias no se unifican. | Evita cuentas duplicadas y fallos de inicio de sesión. Unificar alias depende de cada proveedor y confunde a quien los usa a propósito. |
@@ -66,11 +66,11 @@ El sistema **deniega por defecto**: toda operación requiere una sesión válida
 - **Intento fallido de verificación:** código erróneo introducido para un email con registro en curso, mientras ese email no está bloqueado por RF-15. Los intentos sobre emails sin registro en curso no son intentos fallidos.
 - **Intento fallido de inicio de sesión:** inicio de sesión con credenciales incorrectas y un email de formato válido. No lo son los rechazos por RF-35 ni los intentos rechazados durante el bloqueo de RF-22.
 - **Contraseña filtrada:** contraseña que figura en la lista de contraseñas filtradas que usa el sistema (qué lista se usa se fija en el plan).
-- **Nombre visible:** nombre con el que los demás miembros de un hogar identifican al usuario. Se guarda sin los espacios en blanco de cualquier tipo del principio y del final, y no admite caracteres de control, de formato ni invisibles (como el espacio de ancho cero o los saltos de línea).
+- **Nombre visible:** nombre con el que los demás miembros de un hogar identifican al usuario. Se guarda sin los espacios en blanco de cualquier tipo del principio y del final. Qué longitud y qué caracteres admite lo fija RF-27.
 - **Sesión:** acceso autenticado de un usuario. Cada inicio de sesión, y cada registro completado, crea una sesión nueva, aunque sea desde el mismo dispositivo. Dura hasta que se cierra, caduca o el sistema la finaliza por haberse copiado (RF-36). Su tiempo sin uso cuenta desde que se crea.
 - **Sesión copiada:** sesión de la que el sistema detecta que existe una copia en otras manos (cómo se detecta se fija en el plan).
 - **Uso de una sesión:** cualquier operación realizada con una sesión válida, aunque después se rechace por otro motivo.
-- **Sesión válida:** sesión que no ha finalizado. Una sesión finalizada puede seguir aceptándose durante el margen de RNF-4; pasado ese margen, deja de ser válida.
+- **Sesión válida:** sesión que no ha finalizado. Como excepción tolerada, durante los 5 minutos siguientes a su finalización el sistema puede tratarla todavía como válida (RNF-4).
 - **Email de autenticación:** cualquier email que el sistema envía como parte de esta spec (código de verificación o aviso de intento de registro).
 - **Envío realizado:** email de autenticación aceptado por el servicio de correo.
 
@@ -92,12 +92,14 @@ El sistema **deniega por defecto**: toda operación requiere una sesión válida
 - **RF-35** (HU-1, HU-2, HU-3). SI en cualquier operación el email no tiene formato de dirección de email o supera 254 caracteres (contados sin los espacios del principio y del final), ENTONCES EL SISTEMA rechaza la petición e indica que el email no es válido.
 - **RF-4** (HU-1, HU-2). CUANDO alguien introduce su email, el código de verificación correcto para ese email, un nombre visible y una contraseña válidos, EL SISTEMA crea la cuenta con esos datos.
 - **RF-5** (HU-1). CUANDO EL SISTEMA crea una cuenta al completar un registro, EL SISTEMA crea una sesión nueva para el usuario.
-- **RF-30** (HU-1). SI llegan a la vez varias peticiones para completar el registro de un mismo email, ENTONCES EL SISTEMA crea como mucho una cuenta.
+- **RF-30** (HU-1). SI llegan a la vez varias peticiones para completar el registro de un mismo email, ENTONCES EL SISTEMA crea como mucho una cuenta; las peticiones que no la crean reciben el mensaje genérico de RF-16.
+- **RF-40** (HU-1). EL SISTEMA nunca tiene más de una cuenta para un mismo email (según RF-26).
+- **RF-41** (HU-1, HU-2). SI alguien completa el registro con un código vigente para un email que ya tiene cuenta, ENTONCES EL SISTEMA no crea ninguna cuenta, responde con el mensaje genérico de RF-16 y el intento no cuenta como fallido.
 - **RF-23** (HU-1). SI al completar el registro la contraseña tiene menos de 12 o más de 128 caracteres, ENTONCES EL SISTEMA no crea la cuenta e indica los requisitos de la contraseña.
 - **RF-24** (HU-1). SI al completar el registro la contraseña es una contraseña filtrada, ENTONCES EL SISTEMA no crea la cuenta e indica que la contraseña no es segura.
 - **RF-25** (HU-1). EL SISTEMA admite en la contraseña cualquier carácter, incluidos los espacios, sin exigir combinaciones de tipos de caracteres.
-- **RF-39** (HU-1, HU-3). EL SISTEMA trata como la misma contraseña dos textos que solo difieren en la forma de codificar los mismos caracteres.
-- **RF-27** (HU-1). SI al completar el registro el nombre visible, sin los espacios del principio y del final, tiene menos de 2 o más de 30 caracteres, o contiene saltos de línea o caracteres de control, ENTONCES EL SISTEMA no crea la cuenta e indica los requisitos del nombre.
+- **RF-39** (HU-1, HU-3). EL SISTEMA trata como la misma contraseña dos textos canónicamente equivalentes en Unicode (que solo difieren en la forma de codificar los mismos caracteres). Las variantes de compatibilidad, como las letras de ancho completo, son contraseñas distintas.
+- **RF-27** (HU-1). SI al completar el registro el nombre visible, sin los espacios del principio y del final, tiene menos de 2 o más de 30 caracteres, o contiene caracteres de control, de formato (como el espacio de ancho cero), separadores de línea o de párrafo, o caracteres de uso privado o sin asignar en Unicode, ENTONCES EL SISTEMA no crea la cuenta e indica los requisitos del nombre.
 - **RF-28** (HU-1). SI al completar el registro la contraseña o el nombre visible no son válidos, ENTONCES EL SISTEMA rechaza la petición sin evaluar el código: el código sigue siendo válido y el intento no cuenta como fallido.
 - **RF-37** (HU-1). CUANDO alguien completa el registro, EL SISTEMA valida primero el formato del email (RF-35), después el nombre visible y la contraseña (RF-28) y por último el código.
 
@@ -107,9 +109,10 @@ El sistema **deniega por defecto**: toda operación requiere una sesión válida
 - **RF-9** (HU-2). SI se introduce un código de verificación emitido hace más de 15 minutos, ENTONCES EL SISTEMA lo rechaza.
 - **RF-10** (HU-2). SI se producen 5 intentos fallidos de verificación mientras un mismo código está vigente, ENTONCES EL SISTEMA invalida ese código.
 - **RF-11** (HU-2). CUANDO EL SISTEMA emite un código de verificación nuevo para un email, EL SISTEMA invalida el anterior para ese email.
-- **RF-29** (HU-2). CUANDO EL SISTEMA crea una cuenta con un código de verificación, EL SISTEMA invalida ese código.
+- **RF-29** (HU-2). CUANDO EL SISTEMA crea una cuenta, EL SISTEMA invalida todo código de verificación vigente para ese email.
 - **RF-15** (HU-2). SI se acumulan 10 intentos fallidos de verificación para un mismo email en 24 horas, ENTONCES EL SISTEMA rechaza todo código para ese email, incluido el correcto, durante las 24 horas siguientes al décimo fallo.
 - **RF-16** (HU-2). SI un código es incorrecto, ha caducado o ha sido invalidado, o el email ha alcanzado el tope de RF-15, ENTONCES EL SISTEMA responde con el mismo mensaje genérico, también si no hay ningún registro en curso para ese email.
+- **RF-42** (HU-2). MIENTRAS el registro de un email está bloqueado por RF-15, EL SISTEMA no emite ni envía códigos para ese email: responde igual que siempre, no consume el cupo de RF-12 y no invalida el código anterior.
 
 ### Límite de emails
 
@@ -131,7 +134,7 @@ El sistema **deniega por defecto**: toda operación requiere una sesión válida
 - **RF-19** (HU-3). CUANDO un usuario cierra sesión en todos los dispositivos, EL SISTEMA finaliza todas las sesiones que tenga en ese momento; las que se creen después no se ven afectadas.
 - **RF-20** (HU-3). SI una sesión lleva 30 días sin usarse, ENTONCES EL SISTEMA la finaliza.
 - **RF-21** (HU-3). SI han pasado 90 días desde que se creó una sesión, ENTONCES EL SISTEMA la finaliza aunque se haya seguido usando.
-- **RF-33** (HU-3). SI se intenta una operación con una sesión inexistente o finalizada hace más de 5 minutos, ENTONCES EL SISTEMA la rechaza e indica que hay que iniciar sesión.
+- **RF-33** (HU-3). SI se intenta una operación que requiere sesión sin sesión, con una sesión inexistente o con una finalizada hace más de 5 minutos, ENTONCES EL SISTEMA la rechaza e indica que hay que iniciar sesión.
 - **RF-36** (HU-3). SI EL SISTEMA detecta que una sesión ha sido copiada, ENTONCES EL SISTEMA la finaliza sin afectar a las demás sesiones del usuario.
 
 ### Requisitos eliminados
@@ -152,7 +155,7 @@ El sistema **deniega por defecto**: toda operación requiere una sesión válida
   - Iniciar sesión: email sin cuenta, email con cuenta y contraseña errónea.
   - El autor asume que un atacante con muchas más muestras podría detectar diferencias menores («en la práctica», principio de no enumeración).
 - **RNF-3.** Los límites de RF-10, RF-12, RF-15 y RF-22 se cumplen con exactitud aunque lleguen peticiones simultáneas: en ningún caso se aceptan más intentos ni se envían más emails de los indicados.
-- **RNF-4.** Una sesión finalizada (RF-18 a RF-21) deja de permitir cualquier operación en un plazo máximo de 5 minutos.
+- **RNF-4.** Una sesión finalizada (RF-18 a RF-21 y RF-36) deja de permitir cualquier operación en un plazo máximo de 5 minutos.
 - **RNF-5.** EL SISTEMA comprueba si una contraseña es una contraseña filtrada sin depender de servicios externos, de modo que la comprobación siempre está disponible.
 
 ## Casos límite
@@ -166,6 +169,8 @@ El sistema **deniega por defecto**: toda operación requiere una sesión válida
 - Fuerza bruta acumulada pidiendo códigos nuevos una y otra vez: RF-15, RF-16.
 - Código correcto con una contraseña o un nombre no válidos: RF-28.
 - Dos peticiones simultáneas para completar el mismo registro: RF-30.
+- Una nueva solicitud de registro que se cruza con la finalización del registro: RF-29, RF-40, RF-41.
+- Solicitudes de registro durante el bloqueo de RF-15: RF-42.
 - Fuerza bruta en el inicio de sesión: RF-22, RF-31.
 - Bloqueo malicioso encadenado del inicio de sesión de otra persona: riesgo aceptado (D15); no afecta a sus sesiones abiertas.
 - Peticiones simultáneas para superar cualquier límite: RNF-3.
@@ -180,7 +185,7 @@ El sistema **deniega por defecto**: toda operación requiere una sesión válida
 
 - Pertenencia a hogares, membresías y roles: spec 002.
 - Invitaciones a hogares: spec 003.
-- Recuperación y cambio de contraseña, edición del nombre visible y borrado de cuenta: spec 004 (gestión de cuenta), antes de desplegar.
+- Recuperación y cambio de contraseña, edición del nombre visible, cambio de email y borrado de cuenta: spec 004 (gestión de cuenta), antes de desplegar.
 - Rol de plataforma o superadministrador (D12).
 - Máximo de sesiones simultáneas por usuario: no lo hay.
 - Límite de peticiones por IP o global, y envío masivo de códigos a muchas direcciones distintas (cada una dentro de su límite de RF-12): fase 6.
@@ -206,6 +211,7 @@ Decisiones de *cómo* que salieron en la revisión y no pertenecen a la spec:
 - Si se reintenta un envío fallido y cuántas veces (RF-38).
 - Cómo se mide el último uso de una sesión con el diseño de ADR-0005 (RF-20).
 - Comparación sin distinguir mayúsculas en emails con caracteres no ASCII (RF-26): reglas estándar de Unicode.
+- Qué validación de formato de email se usa (RF-35) y cómo trata los casos frontera (direcciones sin punto en el dominio, comillas, dominios internacionalizados).
 - D14: si el plan sale con más de 10 tareas, decidir cómo dividir el trabajo.
 
 ## Dudas abiertas

@@ -10,7 +10,7 @@
 - Fase en curso: **fase 1 — identidad y hogares**.
 - Fase 1 dividida en specs: 001-authentication → 002-households → 003-invitations; además 004-account-management (recuperación/cambio de contraseña, nombre, borrado) antes de desplegar.
 - Desde 2026-11-23 Claude redacta los requisitos y el autor decide y revisa (variante prevista en ADR-0007).
-- Spec activa: **001-authentication** (borrador, entrevista completa, revisiones 1 y 2 de `/sdd-clarify` resueltas; rama `feat/001-authentication`). Siguiente: revisión 3 con el criterio de parada (regla 8 de `sdd`).
+- Spec activa: **001-authentication** (borrador, entrevista completa, revisiones 1 a 3 de `/sdd-clarify` resueltas; rama `feat/001-authentication`). Siguiente: revisión 4 con el criterio de parada (regla 8 de `sdd`).
 
 ## Decisiones clave
 
@@ -23,6 +23,7 @@ Ver `docs/adr/`. Resumen: NestJS 12 + Prisma 7 + Postgres 18 (0002), monolito mo
 - pnpm bloquea los scripts de instalación: aprobarlos en `pnpm-workspace.yaml` (`allowBuilds`).
 - `prisma.config.ts` usa `env('DATABASE_URL')`: `prisma generate` (y por tanto `pnpm install`) falla si no está definida. Relevante para Docker y CI.
 - Subir ficheros a `.github/workflows/` requiere el scope `workflow` en `gh`.
+- El reviewer (y cualquier subagente) ve el `CLAUDE.md` y sus imports, como este `STATUS.md`, tal como se cargaron al iniciar la sesión: si `STATUS.md` cambia, reiniciar la sesión para que lo vea actualizado.
 
 ## Pendiente
 
