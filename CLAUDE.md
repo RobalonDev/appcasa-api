@@ -23,7 +23,7 @@ Además de producto, es un **proyecto de aprendizaje**: el autor es desarrollado
 Las funcionalidades de dominio se especifican antes de programarse. El método completo está en la skill `sdd` (`.claude/skills/sdd/SKILL.md`).
 
 ```
-/sdd-spec NNN-capacidad → /sdd-clarify NNN-capacidad → [aprobación] → plan + tareas → [aprobación] → implementación (1 tarea cada vez, tests primero) → validación
+/sdd-spec NNN → /sdd-clarify NNN → [aprobación] → /sdd-plan NNN → /sdd-clarify NNN plan → [aprobación] → /sdd-tasks NNN → [aprobación] → implementación (1 tarea cada vez, tests primero) → validación
 ```
 
 - **El autor decide y revisa; Claude entrevista, ofrece opciones con trade-offs, redacta los requisitos** (explicando qué revisar en cada uno) y hace de QA. Nunca introduce reglas de negocio no decididas por el autor.

@@ -16,14 +16,16 @@ Fuente única del método. Motivos y alcance: `docs/adr/0007-spec-driven-develop
 ## Fases
 
 ```
-Spec → Clarificación → [aprobación] → Plan + Tareas → [aprobación] → Implementación → Validación
+Spec → Clarificación → [aprobación] → Plan → Revisión del plan → [aprobación] → Tareas → [aprobación] → Implementación → Validación
 ```
 
 | Fase | Comando | Estado |
 |---|---|---|
 | Spec | `/sdd-spec <NNN-capacidad> <idea>` | disponible |
-| Clarificación | `/sdd-clarify <NNN-capacidad>` | disponible (subagente `reviewer`) |
-| Plan + tareas | `/sdd-plan` | pendiente de crear |
+| Clarificación | `/sdd-clarify <NNN-capacidad>` | disponible (subagente `reviewer`; ciclo con criterio de parada, regla 8) |
+| Plan | `/sdd-plan <NNN-capacidad>` | disponible (entrevista de diseño) |
+| Revisión del plan | `/sdd-clarify <NNN-capacidad> plan` | disponible (una sola pasada) |
+| Tareas | `/sdd-tasks <NNN-capacidad>` | pendiente de crear |
 | Implementación | `/sdd-implement <Tn>` | pendiente de crear |
 | Validación | `/sdd-validate` | pendiente de crear |
 | Cambio | `/sdd-change` | pendiente de crear |
@@ -69,11 +71,14 @@ Ejemplo: `SI un usuario acepta una invitación caducada, ENTONCES EL SISTEMA rec
 
 ## plan.md: CÓMO
 
-Diseño, no listado de ficheros: módulos afectados, modelo de datos, contrato de API, flujos y consistencia (transacciones, concurrencia, idempotencia, eventos), seguridad y aislamiento entre hogares, decisiones con su alternativa descartada, estrategia de tests por RF, riesgos. Cada parte indica qué RF cubre. Una decisión que afecte a más de esta funcionalidad se convierte en ADR.
+Diseño, no listado de funciones: módulos afectados, modelo de datos, contrato de API, flujos y consistencia (transacciones, concurrencia, idempotencia, eventos), seguridad y aislamiento entre hogares, decisiones con su alternativa descartada, notas de la spec resueltas o aplazadas, estrategia de tests (una fila por RF/RNF activo: es la referencia de cobertura), oportunidades de aprendizaje para el autor y riesgos. Cada parte indica qué RF cubre. Una decisión que afecte a más de esta funcionalidad se convierte en ADR.
+
+- Estados: `borrador` → `aprobado` (solo el autor lo aprueba, tras la pasada de `/sdd-clarify <NNN> plan`).
+- Se construye con una entrevista de diseño (`/sdd-plan`): el autor decide la arquitectura; Claude presenta el mapa de decisiones, pregunta, redacta y propone lo mecánico.
 
 ## tasks.md: tareas
 
-- Máximo 10, de 20–30 min, en orden de dependencia. Si salen más, se propone dividir la spec.
+- Máximo 10 por entrega, de 20–30 min, en orden de dependencia. Si salen más, se agrupan en **entregas** (A, B…) de 10 como máximo; cada entrega tiene su PR y valida sus propios RF. La spec no se divide.
 - Formato:
   ```
   - [ ] **Tn. <Descripción>.** RF-x, RF-y · Responsable: autor | claude
@@ -83,4 +88,4 @@ Diseño, no listado de ficheros: módulos afectados, modelo de datos, contrato d
 
 ## Git
 
-Una rama por spec (`feat/NNN-capacidad`), un commit por tarea, PR al validar la spec.
+Una rama por spec (`feat/NNN-capacidad`), un commit por tarea, una PR por entrega (o una sola, si no hay entregas) al validar sus RF.

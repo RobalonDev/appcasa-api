@@ -3,7 +3,7 @@
 - **Plan:** [plan.md](plan.md)
 
 <!--
-Máximo 10 tareas de 20–30 min, en orden de dependencia. Si salen más, dividir la spec.
+Máximo 10 tareas por entrega, de 20–30 min, en orden de dependencia. Si salen más, se agrupan en entregas (A, B…) de 10 como máximo, cada una con su PR.
 Responsable: `autor` (lógica de dominio que conviene hacer a mano) o `claude`
 (infraestructura, código repetitivo). Se puede cambiar sobre la marcha.
 Cada tarea: tests primero (en rojo), luego código hasta verde, marcar [x] y parar.
