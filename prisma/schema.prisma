@@ -1,5 +1,10 @@
 // Prisma schema: https://pris.ly/d/prisma-schema
 // Models are added per bounded context as features land (see docs/adr).
+//
+// Conventions:
+// - Ids are UUIDv7 (ADR-0011).
+// - Tables and columns are snake_case in the database (@@map / @map).
+// - No timestamp defaults: every date comes from the application's Clock (ADR-0012).
 
 generator client {
   provider     = "prisma-client"
@@ -9,4 +14,141 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Identity (spec 001-authentication). Global: no household_id (ADR-0006 exception).
+// ---------------------------------------------------------------------------
+
+model User {
+  id           String    @id @default(uuid(7)) @db.Uuid
+  /// Normalised email (RF-26). Unique: last barrier of RF-40.
+  email        String    @unique
+  displayName  String    @map("display_name")
+  /// argon2id in PHC format (ADR-0008).
+  passwordHash String    @map("password_hash")
+  createdAt    DateTime  @map("created_at") @db.Timestamptz(3)
+  sessions     Session[]
+
+  @@map("users")
+}
+
+enum VerificationCodeStatus {
+  /// Reserved while its email is being sent; not usable yet (ADR-0013).
+  PENDING
+  /// Issued: the mail service accepted it. At most one per email (partial unique index).
+  ACTIVE
+  INVALIDATED
+
+  @@map("verification_code_status")
+}
+
+model VerificationCode {
+  id             String                 @id @default(uuid(7)) @db.Uuid
+  email          String
+  /// HMAC-SHA256 of the code with VERIFICATION_CODE_SECRET; never the code itself.
+  codeHmac       String                 @map("code_hmac")
+  status         VerificationCodeStatus
+  createdAt      DateTime               @map("created_at") @db.Timestamptz(3)
+  /// Set when the code becomes ACTIVE; RF-9 counts from here.
+  issuedAt       DateTime?              @map("issued_at") @db.Timestamptz(3)
+  failedAttempts Int                    @default(0) @map("failed_attempts")
+
+  // Plus, in the migration SQL: UNIQUE (email) WHERE status = 'ACTIVE' (RF-11).
+  @@index([email, status])
+  @@map("verification_codes")
+}
+
+enum AuthEmailKind {
+  VERIFICATION_CODE
+  REGISTRATION_NOTICE
+
+  @@map("auth_email_kind")
+}
+
+enum AuthEmailSendStatus {
+  /// Reserved or in flight; counts for RF-12 (spec D19).
+  PENDING
+  SENT
+
+  @@map("auth_email_send_status")
+}
+
+/// One row per authentication email that counts for the RF-12 limit (ADR-0013).
+model AuthEmailSend {
+  id        String              @id @default(uuid(7)) @db.Uuid
+  email     String
+  kind      AuthEmailKind
+  status    AuthEmailSendStatus
+  createdAt DateTime            @map("created_at") @db.Timestamptz(3)
+
+  @@index([email, createdAt])
+  @@map("auth_email_sends")
+}
+
+/// Failed verification attempts, for the 24-hour cap of RF-15.
+model VerificationFailure {
+  id       String   @id @default(uuid(7)) @db.Uuid
+  email    String
+  failedAt DateTime @map("failed_at") @db.Timestamptz(3)
+
+  @@index([email, failedAt])
+  @@map("verification_failures")
+}
+
+enum LoginOutcome {
+  FAILURE
+  SUCCESS
+
+  @@map("login_outcome")
+}
+
+/// Sign-in attempts that count for RF-22 (rejections during a lockout are not stored, RF-31).
+model LoginAttempt {
+  id      String       @id @default(uuid(7)) @db.Uuid
+  email   String
+  at      DateTime     @db.Timestamptz(3)
+  outcome LoginOutcome
+
+  @@index([email, at])
+  @@map("login_attempts")
+}
+
+enum SessionEndReason {
+  LOGOUT
+  LOGOUT_ALL
+  COPIED
+
+  @@map("session_end_reason")
+}
+
+/// Expiry is computed, not stored: last_used_at + 30 d + 5 min, created_at + 90 d (plan 001).
+model Session {
+  id            String            @id @default(uuid(7)) @db.Uuid
+  userId        String            @map("user_id") @db.Uuid
+  user          User              @relation(fields: [userId], references: [id])
+  createdAt     DateTime          @map("created_at") @db.Timestamptz(3)
+  /// Last renewal; starts equal to created_at (RF-20).
+  lastUsedAt    DateTime          @map("last_used_at") @db.Timestamptz(3)
+  endedAt       DateTime?         @map("ended_at") @db.Timestamptz(3)
+  endReason     SessionEndReason? @map("end_reason")
+  refreshTokens RefreshToken[]
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+/// Every refresh token a session has had: the current one has used_at NULL;
+/// used ones are kept to recognise a copied session (RF-36).
+model RefreshToken {
+  id        String    @id @default(uuid(7)) @db.Uuid
+  sessionId String    @map("session_id") @db.Uuid
+  session   Session   @relation(fields: [sessionId], references: [id])
+  /// SHA-256 of the opaque token (ADR-0008).
+  tokenHash String    @unique @map("token_hash")
+  createdAt DateTime  @map("created_at") @db.Timestamptz(3)
+  usedAt    DateTime? @map("used_at") @db.Timestamptz(3)
+
+  @@index([sessionId])
+  @@map("refresh_tokens")
 }

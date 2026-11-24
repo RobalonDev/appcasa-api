@@ -40,7 +40,7 @@ Los RF con parte unitaria y parte e2e se cierran en la entrega donde existe su r
   - Plan: §Configuración y entorno local.
   - Ficheros: `src/config/env.ts` (+ `env.spec.ts`), `.env.example`, `scripts/generate-secrets.ts` (`pnpm keys:generate`), `.github/workflows/ci.yml` (secretos generados con el mismo script), `package.json` (`engines.node`).
   - Hecho cuando: `env.spec.ts` cubre las variables nuevas (válidas y no válidas); `pnpm keys:generate` imprime un par Ed25519 utilizable; `pnpm check` pasa.
-- [ ] **T3. Esquema de datos y bloqueo por email.** RF-40 · Responsable: claude
+- [x] **T3. Esquema de datos y bloqueo por email.** RF-40 · Responsable: claude
   - Plan: §Modelo de datos; §Módulos afectados (`src/database/`).
   - Ficheros: `prisma/schema.prisma`, `prisma/migrations/…` (con el índice único parcial en SQL), `src/database/lock-key.ts`.
   - Hecho cuando: test `RF-40` (insertar un email duplicado falla en la BD) y tests de que `lockKey` serializa dos transacciones con la misma clave y no bloquea claves distintas, en verde; único parcial sobre `ACTIVE` comprobado; `pnpm check` y `pnpm test:e2e` pasan.
