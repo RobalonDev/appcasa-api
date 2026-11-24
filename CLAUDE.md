@@ -46,7 +46,7 @@ pnpm db:generate          # regenerar cliente tras cambiar schema.prisma
 pnpm db:studio            # explorar la BD
 ```
 
-Primera vez: `cp .env.example .env && pnpm install && pnpm infra:up`.
+Primera vez: `cp .env.example .env && pnpm install && pnpm --silent keys:generate >> .env && pnpm infra:up`.
 
 ## Stack
 

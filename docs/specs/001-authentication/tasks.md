@@ -36,9 +36,9 @@ Los RF con parte unitaria y parte e2e se cierran en la entrega donde existe su r
   - Plan: §Módulos afectados (Infraestructura compartida).
   - Ficheros: `src/http/` (`ProblemDetailsFilter`, `configureApp`, `public.decorator.ts`), `src/clock/`, `src/main.ts`, `src/database/prisma.service.ts` (desconexión en `onApplicationShutdown`), `vitest.config.e2e.ts` (`fileParallelism: false`), `test/app.e2e-spec.ts`.
   - Hecho cuando: tests unitarios del filtro (cuerpo `application/problem+json` con `code`; `VALIDATION_FAILED` con `errors[]`) y del reloj controlable en verde; el e2e de `/health` usa `configureApp`; `pnpm check` y `pnpm test:e2e` pasan.
-- [ ] **T2. Configuración y claves.** ADR-0008, ADR-0009 · Responsable: claude
+- [x] **T2. Configuración y claves.** ADR-0008, ADR-0009 · Responsable: claude
   - Plan: §Configuración y entorno local.
-  - Ficheros: `src/config/env.ts` (+ `env.spec.ts`), `.env.example`, `scripts/generate-jwt-keys.ts` (`pnpm keys:generate`), `.github/workflows/ci.yml` (claves con `openssl`), `package.json` (`engines.node`).
+  - Ficheros: `src/config/env.ts` (+ `env.spec.ts`), `.env.example`, `scripts/generate-secrets.ts` (`pnpm keys:generate`), `.github/workflows/ci.yml` (secretos generados con el mismo script), `package.json` (`engines.node`).
   - Hecho cuando: `env.spec.ts` cubre las variables nuevas (válidas y no válidas); `pnpm keys:generate` imprime un par Ed25519 utilizable; `pnpm check` pasa.
 - [ ] **T3. Esquema de datos y bloqueo por email.** RF-40 · Responsable: claude
   - Plan: §Modelo de datos; §Módulos afectados (`src/database/`).

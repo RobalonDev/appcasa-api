@@ -80,7 +80,7 @@ ADR-0003: un módulo por bounded context, y ningún módulo accede a lo interno 
   - `SMTP_URL` y `MAIL_FROM`.
 - **Generación de claves:**
   - en local, `pnpm keys:generate` imprime las líneas para copiarlas a `.env`;
-  - en CI, un paso las genera con `openssl`.
+  - en CI, un paso ejecuta el mismo script (`node scripts/generate-secrets.ts >> "$GITHUB_ENV"`) con secretos de usar y tirar.
 - **`docker-compose.yml`:** servicio `mailpit`, con versión fijada. SMTP en el puerto 1025 y web en el 8025.
 - **`package.json`:** `engines.node` sube a la primera versión 24.x que trae `crypto.argon2` (se comprueba al implementar; en local hay 24.19).
 - **`vitest.config.e2e.ts`:** `fileParallelism: false`, porque los tests comparten base de datos y reloj controlable.
