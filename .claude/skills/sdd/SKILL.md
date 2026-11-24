@@ -16,14 +16,16 @@ Fuente única del método. Motivos y alcance: `docs/adr/0007-spec-driven-develop
 ## Fases
 
 ```
-Spec → Clarificación → [aprobación] → Plan + Tareas → [aprobación] → Implementación → Validación
+Spec → Clarificación → [aprobación] → Plan → Revisión del plan → [aprobación] → Tareas → [aprobación] → Implementación → Validación
 ```
 
 | Fase | Comando | Estado |
 |---|---|---|
 | Spec | `/sdd-spec <NNN-capacidad> <idea>` | disponible |
-| Clarificación | `/sdd-clarify <NNN-capacidad>` | disponible (subagente `reviewer`) |
-| Plan + tareas | `/sdd-plan` | pendiente de crear |
+| Clarificación | `/sdd-clarify <NNN-capacidad>` | disponible (subagente `reviewer`; ciclo con criterio de parada, regla 8) |
+| Plan | `/sdd-plan <NNN-capacidad>` | disponible (entrevista de diseño) |
+| Revisión del plan | `/sdd-clarify <NNN-capacidad> plan` | disponible (una sola pasada) |
+| Tareas | `/sdd-tasks <NNN-capacidad>` | disponible (propuesta de Claude; el autor elige entregas y responsables) |
 | Implementación | `/sdd-implement <Tn>` | pendiente de crear |
 | Validación | `/sdd-validate` | pendiente de crear |
 | Cambio | `/sdd-change` | pendiente de crear |
@@ -35,10 +37,14 @@ Mientras un comando no exista, la fase se hace en conversación siguiendo estas 
 1. **No se pasa de fase sin aprobación explícita del autor.** Solo el autor cambia el estado de una spec a `aprobada`.
 2. **La spec manda.** Lo que no está en la spec no se implementa. Si falta una decisión, se para y se pregunta.
 3. **Los cambios entran por arriba:** primero spec, luego plan y tareas, por último código.
-4. **El autor decide; Claude ayuda.** En la spec, Claude pregunta, ofrece opciones con trade-offs y propone redacciones, pero no introduce reglas de negocio que el autor no haya decidido. Una decisión pendiente se marca `[NECESITA ACLARACIÓN]`.
+4. **El autor decide y revisa; Claude redacta.** En la spec, Claude pregunta y ofrece opciones con trade-offs; tras cada decisión redacta el requisito, explica qué conviene revisar (qué hueco cierra cada parte) y el autor lo confirma o corrige. Claude no introduce reglas de negocio que el autor no haya decidido: una decisión pendiente se marca `[NECESITA ACLARACIÓN]`. (Desde 2026-11-23; antes redactaba el autor. Variante prevista en ADR-0007.)
 5. **Una tarea cada vez:** tests primero (en rojo), código hasta verde, marcar `[x]`, parar.
 6. **Trazabilidad:** cada test que cubre un requisito lo nombra por su id, p. ej. `it('RF-3: rejects an expired invitation')`.
 7. **Estado del proyecto:** `docs/STATUS.md` apunta a la spec activa pero no copia su progreso; el avance de tareas vive solo en `tasks.md`.
+8. **Criterio de parada de `/sdd-clarify`:** tras resolver una revisión se lanza otra. Si solo quedan detalles de implementación o de redacción menor (no contradicciones, ni huecos de comportamiento, ni riesgos de seguridad), se mueven a «Notas para el plan» o se aceptan, y el autor puede aprobar la spec. Un reviewer exigente siempre encuentra algo: no se itera hasta el veredicto limpio. Antes de actuar sobre un hallazgo, se comprueba (los revisores también se equivocan).
+9. **Spec o plan:** si un test necesita saberlo, va en la spec; si es el *cómo*, va en el plan (o en «Notas para el plan» de la spec).
+10. **Pasada de coherencia:** tras cada lote de cambios en una spec, Claude busca cada término, id y cifra que ha tocado y comprueba que el resto del documento (definiciones, decisiones, casos límite, RNF) sigue diciendo lo mismo, antes de pasarla al reviewer. En la spec 001, dos correcciones introdujeron contradicciones nuevas por no hacerlo.
+11. **Tamaño:** objetivo orientativo de 15 RF por spec como máximo. Si la entrevista lo supera, Claude propone dividirla en ese momento, no al planificar.
 
 ## spec.md: QUÉ y POR QUÉ
 
@@ -65,18 +71,31 @@ Ejemplo: `SI un usuario acepta una invitación caducada, ENTONCES EL SISTEMA rec
 
 ## plan.md: CÓMO
 
-Diseño, no listado de ficheros: módulos afectados, modelo de datos, contrato de API, flujos y consistencia (transacciones, concurrencia, idempotencia, eventos), seguridad y aislamiento entre hogares, decisiones con su alternativa descartada, estrategia de tests por RF, riesgos. Cada parte indica qué RF cubre. Una decisión que afecte a más de esta funcionalidad se convierte en ADR.
+Diseño, no listado de funciones: módulos afectados, modelo de datos, contrato de API, flujos y consistencia (transacciones, concurrencia, idempotencia, eventos), seguridad y aislamiento entre hogares, decisiones con su alternativa descartada, notas de la spec resueltas o aplazadas, estrategia de tests (una fila por RF/RNF activo: es la referencia de cobertura), oportunidades de aprendizaje para el autor y riesgos. Cada parte indica qué RF cubre. Una decisión que afecte a más de esta funcionalidad se convierte en ADR.
+
+- Estados: `borrador` → `aprobado` (solo el autor lo aprueba, tras la pasada de `/sdd-clarify <NNN> plan`).
+- Se construye con una entrevista de diseño (`/sdd-plan`): el autor decide la arquitectura; Claude presenta el mapa de decisiones, pregunta, redacta y propone lo mecánico.
 
 ## tasks.md: tareas
 
-- Máximo 10, de 20–30 min, en orden de dependencia. Si salen más, se propone dividir la spec.
-- Formato:
+- **Tamaño:** una tarea es un comportamiento o una pieza que se puede verificar por sí sola.
+  - Lleva un puñado de tests (orientativo: hasta ~1 h de trabajo y ~10 tests).
+  - Acaba en un commit con `pnpm check` en verde, y `pnpm test:e2e` si toca HTTP o la base de datos.
+  - Si necesita más, se parte en dos.
+- **Orden:** el de las dependencias.
+- **Entregas:** como máximo 10 tareas por entrega. Si salen más, se agrupan en **entregas** (A, B…). Cada entrega tiene su PR y valida sus propios RF. La spec no se divide.
+- **Formato:**
   ```
   - [ ] **Tn. <Descripción>.** RF-x, RF-y · Responsable: autor | claude
-    - Hecho cuando: <comprobación verificable>.
+    - Plan: <sección o secciones del plan>.
+    - Ficheros: <principales que se crean o tocan (orientativo)>.
+    - Hecho cuando: <tests por id en verde + pnpm check>.
   ```
+  «Plan:» y «Ficheros:» apuntan al diseño, no lo copian.
+- **Estados:** `borrador` → `aprobadas`. Solo el autor las aprueba, después de que Claude compruebe la cobertura y las dependencias (no hay reviewer en esta fase).
 - Responsable `autor` para la lógica de dominio que conviene que el autor escriba; `claude` para infraestructura y código repetitivo.
 
 ## Git
 
-Una rama por spec (`feat/NNN-capacidad`), un commit por tarea, PR al validar la spec.
+- La spec, el plan, los ADRs y las tareas se escriben en la rama de la spec (`feat/NNN-capacidad`). Al aprobar las tareas, esa rama se cierra con una **PR solo de documentación**.
+- Cada entrega sale de main en su propia rama (`feat/NNN-capacidad-a`, `-b`…), con un commit por tarea y una PR al validar sus RF. Si no hay entregas, hay una sola entrega A.

@@ -6,9 +6,9 @@ Cada funcionalidad de dominio se especifica antes de programarse. Motivos y alca
 
 ```
 docs/specs/NNN-capacidad/
-  spec.md    QUÉ y POR QUÉ (lo redacta el autor)
-  plan.md    CÓMO: diseño, contrato de API, consistencia, decisiones
-  tasks.md   ≤10 tareas con su responsable y su criterio de "hecho"
+  spec.md    QUÉ y POR QUÉ (la redacta Claude; decide y revisa el autor)
+  plan.md    CÓMO: diseño, contrato de API, consistencia, decisiones (entrevista de diseño)
+  tasks.md   ≤10 tareas por entrega, con su responsable y su criterio de "hecho"
 ```
 
 Plantillas en [`_templates/`](_templates/). Las specs se nombran por capacidad (`001-authentication`), no por fase: un cambio posterior modifica la spec existente.
@@ -17,4 +17,4 @@ Plantillas en [`_templates/`](_templates/). Las specs se nombran por capacidad (
 
 | Spec | Capacidad | Estado |
 |---|---|---|
-| — | — | — |
+| [001](001-authentication/spec.md) | Autenticación | aprobada |
