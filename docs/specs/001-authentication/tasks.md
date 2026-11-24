@@ -1,6 +1,7 @@
 # Tareas 001: Autenticación
 
-- **Estado:** borrador <!-- borrador | aprobadas -->
+- **Estado:** aprobadas <!-- borrador | aprobadas -->
+- **Aprobadas por el autor** el 2026-11-24.
 - **Plan:** [plan.md](plan.md) (debe estar `aprobado`)
 - **Fecha:** 2026-11-24
 - **Responsables:** el autor pidió que Claude implemente todas las tareas (2026-11-24). Se puede cambiar sobre la marcha.
