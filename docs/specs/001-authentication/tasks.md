@@ -60,7 +60,7 @@ Los RF con parte unitaria y parte e2e se cierran en la entrega donde existe su r
   - Plan: §Flujos (Ventana con bloqueo posterior).
   - Ficheros: `src/identity/domain/attempt-window.ts` (+ `.spec.ts`).
   - Hecho cuando: tests unitarios `RF-15` (10 fallos en 24 h; bloqueado hasta 24 h tras el décimo, en ambos bordes), `RF-22` (5 fallos en 15 min sin éxito entre medias; bordes; un éxito reinicia) y `RF-31` (los rechazados no alargan) en verde; `pnpm check` pasa.
-- [ ] **T8. Solicitar el registro: camino normal.** RF-1, RF-6, RF-7, RF-11, RF-35 · Responsable: claude
+- [x] **T8. Solicitar el registro: camino normal.** RF-1, RF-6, RF-7, RF-11, RF-35 · Responsable: claude
   - Plan: §Flujos (Solicitud de registro); §Contrato de API; ADR-0013; §Seguridad (contenido de los emails).
   - Ficheros: `src/identity/registration.controller.ts`, `registration.service.ts`, `registration-email.job.ts` (`AuthEmailJobs` con cola acotada y `drain()`), `identity.module.ts`, `test/identity/registration-request.e2e-spec.ts`.
   - Hecho cuando: e2e `RF-1` (código enviado, sin cuenta), `RF-6` (misma respuesta con y sin cuenta), `RF-7` (aviso en vez de código), `RF-11` (al confirmar, el anterior queda invalidado; mientras está reservado, sigue activo) y `RF-35` (email no válido) en verde; cola llena descarta el trabajo; `pnpm check` y `pnpm test:e2e` pasan.

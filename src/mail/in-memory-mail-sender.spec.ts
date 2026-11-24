@@ -62,6 +62,22 @@ describe('InMemoryMailSender (ADR-0009, ADR-0013)', () => {
     expect(performance.now() - start).toBeGreaterThanOrEqual(45);
   });
 
+  it('can hold the next send until the test releases it', async () => {
+    const mail = new InMemoryMailSender();
+    const release = mail.holdNext();
+    let outcome: string | undefined;
+    const sending = mail.send(message('a@example.test')).then((o) => {
+      outcome = o;
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    expect(outcome).toBeUndefined();
+
+    release();
+    await sending;
+    expect(outcome).toBe('accepted');
+  });
+
   it('can be cleared between tests', async () => {
     const mail = new InMemoryMailSender();
     await mail.send(message('a@example.test'));

@@ -4,6 +4,7 @@ import { ClockModule } from './clock/clock.module.js';
 import { envSchema } from './config/env.js';
 import { DatabaseModule } from './database/database.module.js';
 import { HealthModule } from './health/health.module.js';
+import { IdentityModule } from './identity/identity.module.js';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { HealthModule } from './health/health.module.js';
     ClockModule,
     DatabaseModule,
     HealthModule,
+    IdentityModule,
   ],
 })
 export class AppModule {}

@@ -13,6 +13,7 @@ import {
 export class InMemoryMailSender extends MailSender {
   readonly sent: MailMessage[] = [];
   private readonly outcomes: Exclude<SendOutcome, 'accepted'>[] = [];
+  private readonly holds: Promise<void>[] = [];
   private readonly delayMs: number;
 
   constructor(options: { delayMs?: number } = {}) {
@@ -21,6 +22,10 @@ export class InMemoryMailSender extends MailSender {
   }
 
   async send(message: MailMessage): Promise<SendOutcome> {
+    const hold = this.holds.shift();
+    if (hold) {
+      await hold;
+    }
     if (this.delayMs > 0) {
       await sleep(this.delayMs);
     }
@@ -41,6 +46,16 @@ export class InMemoryMailSender extends MailSender {
     this.outcomes.push('uncertain');
   }
 
+  /**
+   * The next send waits until the returned function is called, so a test can look at
+   * the state while an email is in flight (ADR-0013).
+   */
+  holdNext(): () => void {
+    let release!: () => void;
+    this.holds.push(new Promise<void>((resolve) => (release = resolve)));
+    return release;
+  }
+
   sentTo(email: string): MailMessage[] {
     return this.sent.filter((message) => message.to === email);
   }
@@ -48,5 +63,6 @@ export class InMemoryMailSender extends MailSender {
   clear(): void {
     this.sent.length = 0;
     this.outcomes.length = 0;
+    this.holds.length = 0;
   }
 }
