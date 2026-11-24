@@ -55,6 +55,7 @@ Nest ofrece un paquete oficial, `@nestjs/authentication`, que resuelve gran part
   - si llega un refresh ya usado, la sesión se considera copiada y se finaliza solo esa (RF-36);
   - sin ventana de gracia.
 - **Último uso de una sesión (RF-20)** = el momento de su última renovación. No se puede operar más de 5 minutos sin renovar, así que el error es de 5 minutos como mucho.
+  - _Precisado el 2026-11-24 (revisión del plan 001):_ para no finalizar nunca una sesión antes de los 30 días sin uso, se da por caducada en `última renovación + 30 días + 5 minutos`. Como mucho caduca 5 minutos tarde, dentro de la tolerancia de «sesión válida» (RNF-4). No cambia la decisión.
 - **Transporte:**
   - el JWT de acceso va en `Authorization: Bearer`;
   - el refresh viaja en el cuerpo JSON, tanto en las respuestas (registro, inicio de sesión, renovación) como en las peticiones (renovación, cierre de sesión);

@@ -1,6 +1,6 @@
 # ADR-0009: Envío de emails de autenticación: en segundo plano y detrás de una interfaz
 
-- **Estado:** Aceptado
+- **Estado:** Aceptado; sustituido en parte por [ADR-0013](0013-envio-de-emails-reservar-enviar-confirmar.md) (cómo se ejecuta el trabajo de envío, la cola acotada y qué pasa si falla el commit)
 - **Fecha:** 2026-11-24
 
 ## Contexto

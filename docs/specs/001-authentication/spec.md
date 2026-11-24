@@ -4,6 +4,7 @@
 - **Fecha:** 2026-11-23
 - **ADRs relacionados:** [0005](../../adr/0005-autenticacion-propia.md), [0006](../../adr/0006-hogar-como-tenant.md)
 - **Entrevista:** 4 rondas. **Revisiones de `/sdd-clarify`:** 4 (12 → 7 → 3 → 1 problemas). **Aprobada por el autor** el 2026-11-23 aplicando la regla 8 de `sdd`. Siguiente paso: plan.
+- **Cambios tras la aprobación:** 2026-11-24, D19–D21 (aclaraciones surgidas en `/sdd-clarify` del plan; aprobadas por el autor).
 
 <!--
 Solo QUÉ y POR QUÉ. Nada de tecnología, tablas, endpoints ni nombres de ficheros: eso va en plan.md.
@@ -22,7 +23,7 @@ El sistema **deniega por defecto**: toda operación requiere una sesión válida
 
 **Principio de no enumeración:** ninguna operación pública (solicitar el registro, completarlo, iniciar sesión) permite averiguar en la práctica si un email tiene cuenta a quien no conoce su contraseña: ni por el mensaje ni por el tiempo de respuesta (umbral medible en RNF-2).
 
-**Regla de precedencia:** cuando se aplica un límite o un bloqueo (RF-12, RF-15, RF-22) o un rechazo por datos no válidos (RF-23, RF-24, RF-27, RF-35), prevalece sobre los requisitos del flujo normal (RF-1, RF-4, RF-7, RF-17). Por ejemplo, durante el bloqueo de RF-15 una solicitud de registro se responde igual, pero no se emite ni se envía ningún código (RF-42) y ningún código permite completar el registro.
+**Regla de precedencia:** cuando se aplica un límite o un bloqueo (RF-12, RF-15, RF-22) o un rechazo por datos no válidos (RF-23, RF-24, RF-27, RF-35), prevalece sobre los requisitos del flujo normal (RF-1, RF-4, RF-7, RF-17) en las operaciones a las que se aplica: el bloqueo de RF-22 afecta solo al inicio de sesión, no a completar el registro (D20). Por ejemplo, durante el bloqueo de RF-15 una solicitud de registro se responde igual, pero no se emite ni se envía ningún código (RF-42) y ningún código permite completar el registro.
 
 ### Decisiones del autor y su porqué
 
@@ -51,6 +52,9 @@ El sistema **deniega por defecto**: toda operación requiere una sesión válida
 | D16 | Solo cuenta como intento fallido de verificación un código erróneo para un email con registro en curso, fuera del bloqueo de RF-15. Se acepta que un tercero pueda retrasar el registro de otra persona (bloquearlo 24 h o invalidar su código). | Contar todos los intentos permitiría bloquear el registro de cualquier email sin pedir siquiera un código, y que el bloqueo se alargara solo. La interferencia no da acceso a nada y D2 la limita. |
 | D17 | Una sesión finalizada deja de permitir cualquier operación en 5 minutos como máximo. | Encaja con el diseño de ADR-0005. Un dispositivo perdido conserva acceso como mucho 5 minutos después de «cerrar sesión en todos los dispositivos». |
 | D18 | Si el sistema detecta que una sesión ha sido copiada, finaliza esa sesión sin afectar a las demás. | Es la respuesta estándar ante el robo de una sesión: el atacante pierde el acceso y no tiene la contraseña para volver a entrar. Finalizarlas todas convertiría un fallo de red en un cierre de sesión en todos los dispositivos. |
+| D19 | Los envíos en curso, también los de resultado incierto, cuentan para el límite de RF-12. _(2026-11-24)_ | Garantiza que el límite nunca se supera (RNF-3) aunque el sistema falle a mitad de un envío. A cambio, mientras dura un envío que acaba fallando (unos segundos), una nueva solicitud puede quedarse sin envío. |
+| D20 | Completar el registro no se ve afectado por el bloqueo de inicio de sesión de RF-22. _(2026-11-24)_ | El bloqueo frena la adivinación de contraseñas; al completar el registro no hay contraseña que adivinar, porque el código ya demuestra que se controla el email. Aplicarlo daría a un tercero otra forma de retrasar registros ajenos. |
+| D21 | RNF-1 cubre las operaciones sobre datos de usuarios. Renovar y cerrar una sesión se acreditan con la propia sesión aunque su acceso de corta duración haya caducado. _(2026-11-24)_ | Sin eso, un dispositivo que lleva más de unos minutos sin usarse no podría renovar ni cerrar su sesión, y la comprobación de estado que usa la infraestructura exigiría una cuenta. |
 
 ## Usuarios
 
@@ -73,6 +77,7 @@ El sistema **deniega por defecto**: toda operación requiere una sesión válida
 - **Sesión válida:** sesión que no ha finalizado. Como excepción tolerada, durante los 5 minutos siguientes a su finalización el sistema puede tratarla todavía como válida (RNF-4).
 - **Email de autenticación:** cualquier email que el sistema envía como parte de esta spec (código de verificación o aviso de intento de registro).
 - **Envío realizado:** email de autenticación aceptado por el servicio de correo.
+- **Envío en curso:** email de autenticación cuyo envío se ha iniciado y del que el sistema aún no sabe si el servicio de correo lo ha aceptado, incluido el que nunca llega a saberlo (resultado incierto).
 
 ## Historias de usuario
 
@@ -116,7 +121,7 @@ El sistema **deniega por defecto**: toda operación requiere una sesión válida
 
 ### Límite de emails
 
-- **RF-12** (HU-1, HU-2). SI enviar un email de autenticación a una dirección supondría más de 1 envío en el último minuto o más de 5 en la última hora, ENTONCES EL SISTEMA no lo envía y responde igual que si lo hubiera enviado. Solo cuentan los envíos realizados.
+- **RF-12** (HU-1, HU-2). SI enviar un email de autenticación a una dirección supondría más de 1 envío en el último minuto o más de 5 en la última hora, ENTONCES EL SISTEMA no lo envía y responde igual que si lo hubiera enviado. Cuentan los envíos realizados y los envíos en curso; los que fallan no cuentan (RF-38, D19).
 - **RF-32** (HU-2). SI RF-12 impide enviar un código de verificación, ENTONCES EL SISTEMA no emite un código nuevo y el anterior sigue siendo válido.
 - **RF-38** (HU-1, HU-2). SI falla el envío de un email de autenticación, ENTONCES EL SISTEMA responde igual que si se hubiera enviado, no emite el código nuevo (el anterior sigue siendo válido) y ese envío no cuenta para RF-12.
 
@@ -148,7 +153,7 @@ El sistema **deniega por defecto**: toda operación requiere una sesión válida
 
 ## Requisitos no funcionales
 
-- **RNF-1.** EL SISTEMA exige una sesión válida en toda operación salvo las marcadas explícitamente como públicas: solicitar el registro, completar el registro e iniciar sesión.
+- **RNF-1.** EL SISTEMA exige una sesión válida en toda operación salvo las marcadas explícitamente como públicas: solicitar el registro, completar el registro e iniciar sesión. Renovar una sesión y cerrarla se acreditan con la propia sesión, aunque el acceso de corta duración que lleva asociado haya caducado (D21).
 - **RNF-2.** EL SISTEMA responde en un tiempo que no permite distinguir si un email tiene cuenta: en cada operación, la diferencia entre los tiempos medios de cualquier par de los casos indicados no supera 50 ms, medida sobre 100 peticiones por caso, cada una con un email distinto para que no se aplique ningún límite.
   - Solicitar el registro: email sin cuenta, email con cuenta.
   - Completar el registro: email con cuenta, email sin registro en curso, email con registro en curso y código erróneo.
@@ -180,6 +185,7 @@ El sistema **deniega por defecto**: toda operación requiere una sesión válida
 - Inicio de sesión simultáneo a «cerrar sesión en todos los dispositivos»: RF-19.
 - Sesión robada y usada desde otro sitio: RF-36.
 - Fallo del servicio de correo: RF-38.
+- Fallo del sistema a mitad de un envío, o envío de resultado incierto: cuenta para RF-12 (D19).
 - La misma contraseña escrita en dispositivos que codifican el texto de forma distinta: RF-39.
 
 ## Fuera de alcance
@@ -191,6 +197,7 @@ El sistema **deniega por defecto**: toda operación requiere una sesión válida
 - Máximo de sesiones simultáneas por usuario: no lo hay.
 - Límite de peticiones por IP o global, y envío masivo de códigos a muchas direcciones distintas (cada una dentro de su límite de RF-12): fase 6.
 - Interfaz de usuario (pantallas, navegación, redirecciones): la decide cada cliente; esta spec define el comportamiento de la API.
+- Operaciones de infraestructura que no actúan sobre datos de usuarios, como comprobar el estado del servicio (D21).
 
 ## Criterios de finalización
 

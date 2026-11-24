@@ -1,6 +1,6 @@
 # ADR-0010: Límites exactos bajo concurrencia: eventos en Postgres y bloqueo consultivo por clave
 
-- **Estado:** Aceptado
+- **Estado:** Aceptado; sustituido en parte por [ADR-0013](0013-envio-de-emails-reservar-enviar-confirmar.md) (el bloqueo ya no cubre el envío SMTP)
 - **Fecha:** 2026-11-24
 
 ## Contexto
