@@ -56,7 +56,7 @@ Los RF con parte unitaria y parte e2e se cierran en la entrega donde existe su r
   - Plan: §Módulos afectados (`crypto/`); §Contrato de API (contenido y verificación del JWT); ADR-0008.
   - Ficheros: `src/identity/crypto/password-hasher.ts`, `tokens.service.ts` (+ `*.spec.ts`), dependencia `jose`.
   - Hecho cuando: tests unitarios en verde: argon2id PHC verifica y rechaza, `needsRehash`, hash ficticio; `RF-39` (NFC y NFD verifican igual; ancho completo no); JWT EdDSA válido y rechazo de manipulado, otro algoritmo, `iss`/`aud` erróneos y caducado (`RF-33`); refresh de 32 bytes y su SHA-256; HMAC de código; `pnpm check` pasa.
-- [ ] **T7. Ventana con bloqueo posterior.** RF-15, RF-22, RF-31 · Responsable: claude
+- [x] **T7. Ventana con bloqueo posterior.** RF-15, RF-22, RF-31 · Responsable: claude
   - Plan: §Flujos (Ventana con bloqueo posterior).
   - Ficheros: `src/identity/domain/attempt-window.ts` (+ `.spec.ts`).
   - Hecho cuando: tests unitarios `RF-15` (10 fallos en 24 h; bloqueado hasta 24 h tras el décimo, en ambos bordes), `RF-22` (5 fallos en 15 min sin éxito entre medias; bordes; un éxito reinicia) y `RF-31` (los rechazados no alargan) en verde; `pnpm check` pasa.
