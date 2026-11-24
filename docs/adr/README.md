@@ -21,3 +21,4 @@ Un ADR documenta **una** decisión técnica relevante: qué problema había, qu�
 | [0005](0005-autenticacion-propia.md) | Autenticación propia con JWT y refresh tokens | Aceptado |
 | [0006](0006-hogar-como-tenant.md) | El hogar como tenant; un usuario puede pertenecer a varios | Aceptado |
 | [0007](0007-spec-driven-development.md) | Spec-Driven Development ligero para funcionalidades de dominio | Aceptado |
+| [0008](0008-diseno-de-la-autenticacion.md) | Diseño de la autenticación: sesiones, tokens y hash de contraseñas | Aceptado |
