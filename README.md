@@ -16,7 +16,7 @@ Requisitos: Node ≥ 24.7, pnpm 11, Docker.
 cp .env.example .env
 pnpm install          # instala dependencias y genera el cliente de Prisma
 pnpm --silent keys:generate >> .env   # claves JWT y secreto de códigos (ADR-0008)
-pnpm infra:up         # levanta PostgreSQL en Docker
+pnpm infra:up         # levanta PostgreSQL y Mailpit (emails locales: http://localhost:8025)
 pnpm start:dev        # API en http://localhost:3000
 curl localhost:3000/health
 ```

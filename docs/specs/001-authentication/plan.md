@@ -434,7 +434,7 @@ Claude se encarga del resto:
 - RNF-2 y los parámetros de argon2: si se cambian, las cuentas con el hash antiguo tardan distinto que un email sin cuenta hasta que vuelven a iniciar sesión. Se acepta mientras los parámetros no cambien; antes de cambiarlos, hay que revisarlo.
 - La lista de contraseñas filtradas solo cubre las más frecuentes (E1).
 - Formato del email: se rechazan algunas direcciones válidas pero raras (E2).
-- `@types/nodemailer` va por la versión 8.0.2: al instalar hay que comprobar que cubre nodemailer 10.
+- ~~`@types/nodemailer` va por la versión 8.0.2~~ Resuelto en T4: nodemailer 10 trae sus propios tipos.
 - Los datos de autenticación, incluidas las reservas `PENDING`, crecen sin limpiarse hasta la fase 2 (E5). Hay que limpiarlos antes de desplegar.
 
 ## Estimación

@@ -44,7 +44,7 @@ Los RF con parte unitaria y parte e2e se cierran en la entrega donde existe su r
   - Plan: §Modelo de datos; §Módulos afectados (`src/database/`).
   - Ficheros: `prisma/schema.prisma`, `prisma/migrations/…` (con el índice único parcial en SQL), `src/database/lock-key.ts`.
   - Hecho cuando: test `RF-40` (insertar un email duplicado falla en la BD) y tests de que `lockKey` serializa dos transacciones con la misma clave y no bloquea claves distintas, en verde; único parcial sobre `ACTIVE` comprobado; `pnpm check` y `pnpm test:e2e` pasan.
-- [ ] **T4. Envío de correo.** ADR-0009 · Responsable: claude
+- [x] **T4. Envío de correo.** ADR-0009 · Responsable: claude
   - Plan: §Módulos afectados (`src/mail/`); §Configuración (Mailpit).
   - Ficheros: `src/mail/` (`MailSender`, `SmtpMailSender`, `InMemoryMailSender`, módulo), `docker-compose.yml` (`mailpit`), dependencia `nodemailer`.
   - Hecho cuando: tests unitarios de `InMemoryMailSender` (registra enviados, simula fallo, resultado incierto y retardo) en verde; con `pnpm infra:up`, un envío de prueba aparece en Mailpit (`localhost:8025`); `pnpm check` pasa.
