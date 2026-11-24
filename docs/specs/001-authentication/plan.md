@@ -1,11 +1,12 @@
 # Plan 001: Autenticación
 
-- **Estado:** borrador <!-- borrador | aprobado -->
+- **Estado:** aprobado <!-- borrador | aprobado -->
 - **Spec:** [spec.md](spec.md) (debe estar `aprobada`)
 - **Fecha:** 2026-11-24
 - **ADRs:** [0008](../../adr/0008-diseno-de-la-autenticacion.md), [0009](../../adr/0009-envio-de-emails-de-autenticacion.md), [0010](../../adr/0010-limites-y-concurrencia-por-clave.md), [0011](../../adr/0011-convenciones-de-la-api.md), [0012](../../adr/0012-convenciones-transversales-de-la-aplicacion.md), [0013](../../adr/0013-envio-de-emails-reservar-enviar-confirmar.md)
 - **Entrevista de diseño:** terminada en 3 rondas (A1–A5; B1, B2, C1, D1, D2; E1–E5 y la propuesta de lo que se deduce de ellas).
-- **Revisión `/sdd-clarify … plan`:** hecha el 2026-11-24. Encontró 7 problemas, resueltos con las decisiones Q1–Q5, los ADRs 0012 y 0013 y las aclaraciones D19–D21 de la spec. Las observaciones también se han incorporado. Siguiente paso: aprobación del autor y después `/sdd-tasks`.
+- **Revisión `/sdd-clarify … plan`:** hecha el 2026-11-24. Encontró 7 problemas, resueltos con las decisiones Q1–Q5, los ADRs 0012 y 0013 y las aclaraciones D19–D21 de la spec. Las observaciones también se han incorporado.
+- **Aprobado por el autor** el 2026-11-24. Siguiente paso: `/sdd-tasks 001-authentication`.
 
 <!--
 CÓMO se implementa. Describe el diseño, no un listado de funciones (eso caduca al programar).
