@@ -52,7 +52,7 @@ Los RF con parte unitaria y parte e2e se cierran en la entrega donde existe su r
   - Plan: §Flujos (Normalización); §Módulos afectados (`domain/`).
   - Ficheros: `src/identity/domain/email.ts`, `verification-code.ts` (+ `*.spec.ts`).
   - Hecho cuando: tests unitarios `RF-26` (mayúsculas y espacios Unicode en los extremos), `RF-35` (formato, > 254, ausente; casos de E2) y `RF-34` (6 dígitos con ceros a la izquierda) en verde; `pnpm check` pasa.
-- [ ] **T6. Criptografía: hash de contraseñas y tokens.** RF-33, RF-39 · Responsable: claude
+- [x] **T6. Criptografía: hash de contraseñas y tokens.** RF-33, RF-39 · Responsable: claude
   - Plan: §Módulos afectados (`crypto/`); §Contrato de API (contenido y verificación del JWT); ADR-0008.
   - Ficheros: `src/identity/crypto/password-hasher.ts`, `tokens.service.ts` (+ `*.spec.ts`), dependencia `jose`.
   - Hecho cuando: tests unitarios en verde: argon2id PHC verifica y rechaza, `needsRehash`, hash ficticio; `RF-39` (NFC y NFD verifican igual; ancho completo no); JWT EdDSA válido y rechazo de manipulado, otro algoritmo, `iss`/`aud` erróneos y caducado (`RF-33`); refresh de 32 bytes y su SHA-256; HMAC de código; `pnpm check` pasa.
