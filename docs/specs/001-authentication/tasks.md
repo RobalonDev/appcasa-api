@@ -48,7 +48,7 @@ Los RF con parte unitaria y parte e2e se cierran en la entrega donde existe su r
   - Plan: §Módulos afectados (`src/mail/`); §Configuración (Mailpit).
   - Ficheros: `src/mail/` (`MailSender`, `SmtpMailSender`, `InMemoryMailSender`, módulo), `docker-compose.yml` (`mailpit`), dependencia `nodemailer`.
   - Hecho cuando: tests unitarios de `InMemoryMailSender` (registra enviados, simula fallo, resultado incierto y retardo) en verde; con `pnpm infra:up`, un envío de prueba aparece en Mailpit (`localhost:8025`); `pnpm check` pasa.
-- [ ] **T5. Email y código de verificación (dominio).** RF-26, RF-34, RF-35 · Responsable: claude
+- [x] **T5. Email y código de verificación (dominio).** RF-26, RF-34, RF-35 · Responsable: claude
   - Plan: §Flujos (Normalización); §Módulos afectados (`domain/`).
   - Ficheros: `src/identity/domain/email.ts`, `verification-code.ts` (+ `*.spec.ts`).
   - Hecho cuando: tests unitarios `RF-26` (mayúsculas y espacios Unicode en los extremos), `RF-35` (formato, > 254, ausente; casos de E2) y `RF-34` (6 dígitos con ceros a la izquierda) en verde; `pnpm check` pasa.
