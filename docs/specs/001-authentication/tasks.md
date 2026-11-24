@@ -32,7 +32,7 @@ Los RF con parte unitaria y parte e2e se cierran en la entrega donde existe su r
 
 ## Entrega A — Base y solicitud de registro (`feat/001-authentication-a`)
 
-- [ ] **T1. Base transversal de la app.** ADR-0011, ADR-0012 · Responsable: claude
+- [x] **T1. Base transversal de la app.** ADR-0011, ADR-0012 · Responsable: claude
   - Plan: §Módulos afectados (Infraestructura compartida).
   - Ficheros: `src/http/` (`ProblemDetailsFilter`, `configureApp`, `public.decorator.ts`), `src/clock/`, `src/main.ts`, `src/database/prisma.service.ts` (desconexión en `onApplicationShutdown`), `vitest.config.e2e.ts` (`fileParallelism: false`), `test/app.e2e-spec.ts`.
   - Hecho cuando: tests unitarios del filtro (cuerpo `application/problem+json` con `code`; `VALIDATION_FAILED` con `errors[]`) y del reloj controlable en verde; el e2e de `/health` usa `configureApp`; `pnpm check` y `pnpm test:e2e` pasan.
