@@ -10,7 +10,7 @@
 - Fase en curso: **fase 1 — identidad y hogares**.
 - Fase 1 dividida en specs: 001-authentication → 002-households → 003-invitations; además 004-account-management (recuperación/cambio de contraseña, nombre, borrado) antes de desplegar.
 - Desde 2026-11-23 Claude redacta los requisitos y el autor decide y revisa (variante prevista en ADR-0007).
-- Spec activa: **001-authentication** (aprobada el 2026-11-23; rama `feat/001-authentication`). **Plan en curso** (`/sdd-plan`): rondas 1 y 2 de 3 hechas (ADR-0008 a 0011); falta la ronda 3 (lista filtrada, email, RF-22 vs registro, medición de RNF-2, limpieza y lo mecánico). Si salen más de 10 tareas, entregas (D14, P3).
+- Spec activa: **001-authentication** (aprobada el 2026-11-23; rama `feat/001-authentication`). **Plan terminado en borrador** (3 rondas; ADR-0008 a 0011). Siguiente: `/sdd-clarify 001-authentication plan` (una pasada) → aprobación del autor → `/sdd-tasks`. Si salen más de 10 tareas, entregas (D14, P3).
 
 ## Decisiones clave
 
@@ -27,4 +27,5 @@ Ver `docs/adr/`. Resumen: NestJS 12 + Prisma 7 + Postgres 18 (0002), monolito mo
 
 ## Pendiente
 
+- Limpieza de datos de autenticación caducados (eventos de límites, códigos, sesiones finalizadas): fase 2, antes de desplegar (plan 001, E5).
 - Licencia: se queda `UNLICENSED` (decisión del autor).
