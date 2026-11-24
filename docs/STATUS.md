@@ -6,11 +6,11 @@
 ## Estado actual
 
 - Fase 0 (base) completada el 2026-11-16. CI en verde.
-- SDD ligero adoptado el 2026-11-17 (ADR-0007). Disponibles `/sdd-spec`, `/sdd-clarify` (spec y plan) y `/sdd-plan`; el resto de comandos se crean al llegar a cada fase.
+- SDD ligero adoptado el 2026-11-17 (ADR-0007). Disponibles `/sdd-spec`, `/sdd-clarify` (spec y plan), `/sdd-plan` y `/sdd-tasks`; el resto de comandos se crean al llegar a cada fase.
 - Fase en curso: **fase 1 — identidad y hogares**.
 - Fase 1 dividida en specs: 001-authentication → 002-households → 003-invitations; además 004-account-management (recuperación/cambio de contraseña, nombre, borrado) antes de desplegar.
 - Desde 2026-11-23 Claude redacta los requisitos y el autor decide y revisa (variante prevista en ADR-0007).
-- Spec activa: **001-authentication** (aprobada el 2026-11-23; aclarada con D19–D21 el 2026-11-24; rama `feat/001-authentication`). **Plan aprobado** el 2026-11-24 (ADR-0008 a 0013). Siguiente: `/sdd-tasks 001-authentication` (comando por crear). Si salen más de 10 tareas, entregas (D14, P3).
+- Spec activa: **001-authentication** (aprobada el 2026-11-23; aclarada con D19–D21 el 2026-11-24; rama `feat/001-authentication`). **Plan aprobado** el 2026-11-24 (ADR-0008 a 0013). Siguiente: `/sdd-tasks 001-authentication`; si salen más de 10 tareas, entregas (D14, P3). Después: PR de docs de esta rama y una rama por entrega desde main.
 
 ## Decisiones clave
 

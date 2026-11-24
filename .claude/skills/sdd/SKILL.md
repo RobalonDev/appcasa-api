@@ -25,7 +25,7 @@ Spec → Clarificación → [aprobación] → Plan → Revisión del plan → [a
 | Clarificación | `/sdd-clarify <NNN-capacidad>` | disponible (subagente `reviewer`; ciclo con criterio de parada, regla 8) |
 | Plan | `/sdd-plan <NNN-capacidad>` | disponible (entrevista de diseño) |
 | Revisión del plan | `/sdd-clarify <NNN-capacidad> plan` | disponible (una sola pasada) |
-| Tareas | `/sdd-tasks <NNN-capacidad>` | pendiente de crear |
+| Tareas | `/sdd-tasks <NNN-capacidad>` | disponible (propuesta de Claude; el autor elige entregas y responsables) |
 | Implementación | `/sdd-implement <Tn>` | pendiente de crear |
 | Validación | `/sdd-validate` | pendiente de crear |
 | Cambio | `/sdd-change` | pendiente de crear |
@@ -78,14 +78,24 @@ Diseño, no listado de funciones: módulos afectados, modelo de datos, contrato 
 
 ## tasks.md: tareas
 
-- Máximo 10 por entrega, de 20–30 min, en orden de dependencia. Si salen más, se agrupan en **entregas** (A, B…) de 10 como máximo; cada entrega tiene su PR y valida sus propios RF. La spec no se divide.
-- Formato:
+- **Tamaño:** una tarea es un comportamiento o una pieza que se puede verificar por sí sola.
+  - Lleva un puñado de tests (orientativo: hasta ~1 h de trabajo y ~10 tests).
+  - Acaba en un commit con `pnpm check` en verde, y `pnpm test:e2e` si toca HTTP o la base de datos.
+  - Si necesita más, se parte en dos.
+- **Orden:** el de las dependencias.
+- **Entregas:** como máximo 10 tareas por entrega. Si salen más, se agrupan en **entregas** (A, B…). Cada entrega tiene su PR y valida sus propios RF. La spec no se divide.
+- **Formato:**
   ```
   - [ ] **Tn. <Descripción>.** RF-x, RF-y · Responsable: autor | claude
-    - Hecho cuando: <comprobación verificable>.
+    - Plan: <sección o secciones del plan>.
+    - Ficheros: <principales que se crean o tocan (orientativo)>.
+    - Hecho cuando: <tests por id en verde + pnpm check>.
   ```
+  «Plan:» y «Ficheros:» apuntan al diseño, no lo copian.
+- **Estados:** `borrador` → `aprobadas`. Solo el autor las aprueba, después de que Claude compruebe la cobertura y las dependencias (no hay reviewer en esta fase).
 - Responsable `autor` para la lógica de dominio que conviene que el autor escriba; `claude` para infraestructura y código repetitivo.
 
 ## Git
 
-Una rama por spec (`feat/NNN-capacidad`), un commit por tarea, una PR por entrega (o una sola, si no hay entregas) al validar sus RF.
+- La spec, el plan, los ADRs y las tareas se escriben en la rama de la spec (`feat/NNN-capacidad`). Al aprobar las tareas, esa rama se cierra con una **PR solo de documentación**.
+- Cada entrega sale de main en su propia rama (`feat/NNN-capacidad-a`, `-b`…), con un commit por tarea y una PR al validar sus RF. Si no hay entregas, hay una sola entrega A.
