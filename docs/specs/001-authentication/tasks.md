@@ -94,7 +94,7 @@ Los RF con parte unitaria y parte e2e se cierran en la entrega donde existe su r
 
 ## Entrega C — Sesiones y requisitos globales (`feat/001-authentication-c`)
 
-- [ ] **T15. Iniciar sesión.** RF-13, RF-17, RF-22, RF-26, RF-31, RF-35, RF-39 · Responsable: claude
+- [x] **T15. Iniciar sesión.** RF-13, RF-17, RF-22, RF-26, RF-31, RF-35, RF-39 · Responsable: claude
   - Plan: §Flujos (Iniciar sesión); §Contrato de API.
   - Ficheros: `sessions.controller.ts`, `sessions.service.ts`, `test/identity/sign-in.e2e-spec.ts`.
   - Hecho cuando: e2e `RF-13`, `RF-17`, `RF-22` (bordes de 15 min; sin cuenta; contraseña correcta bloqueada; un éxito reinicia), `RF-31`, `RF-26`, `RF-35` y `RF-39` (registro NFC, login NFD) en verde; re-hash al cambiar parámetros; `pnpm check` y `pnpm test:e2e` pasan.

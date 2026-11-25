@@ -1,11 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { Clock } from '../clock/clock.js';
+import { lockKey } from '../database/lock-key.js';
+import { PrismaService } from '../database/prisma.service.js';
 import type { Prisma } from '../generated/prisma/client.js';
+import { ProblemException } from '../http/problem.js';
+import { PasswordHasher } from './crypto/password-hasher.js';
 import {
   ACCESS_TOKEN_TTL_SECONDS,
   TokensService,
 } from './crypto/tokens.service.js';
+import { lockedUntil, SIGN_IN_LOCKOUT } from './domain/attempt-window.js';
+import { EMAIL_LOCK } from './email-lock.js';
 
-/** What registering or signing in returns (plan 001, API contract). */
+/** What registering, signing in and renewing return (plan 001, API contract). */
 export interface SessionTokens {
   accessToken: string;
   tokenType: 'Bearer';
@@ -13,9 +20,80 @@ export interface SessionTokens {
   refreshToken: string;
 }
 
+type SignInResult =
+  | { kind: 'signed-in'; tokens: SessionTokens }
+  | { kind: 'invalid-credentials' };
+
+/** RF-13, RF-22: one answer for an unknown email, a wrong password and a lockout. */
+function invalidCredentials(): ProblemException {
+  return new ProblemException({
+    status: HttpStatus.UNAUTHORIZED,
+    code: 'INVALID_CREDENTIALS',
+  });
+}
+
 @Injectable()
 export class SessionsService {
-  constructor(private readonly tokens: TokensService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly clock: Clock,
+    private readonly hasher: PasswordHasher,
+    private readonly tokens: TokensService,
+  ) {}
+
+  /**
+   * Sign-in (plan «Iniciar sesión»). Under the email lock, so concurrent wrong
+   * passwords are counted exactly (RNF-3). Every path computes exactly one password
+   * hash, so timing does not reveal whether the email has an account (RNF-2).
+   * Nothing is thrown inside the transaction: the failures it records must commit.
+   */
+  async signIn(email: string, password: string): Promise<SessionTokens> {
+    const result = await this.prisma.$transaction(
+      async (tx): Promise<SignInResult> => {
+        await lockKey(tx, EMAIL_LOCK, email);
+        const now = this.clock.now();
+        const invalid = { kind: 'invalid-credentials' } as const;
+
+        // RF-22: locked → rejected even with the right password, and not counted (RF-31).
+        if (await this.isSignInLocked(tx, email, now)) {
+          await this.hasher.verify(null, password);
+          return invalid;
+        }
+
+        const user = await tx.user.findUnique({ where: { email } });
+        const matches = await this.hasher.verify(
+          user?.passwordHash ?? null,
+          password,
+        );
+        if (!user || !matches) {
+          // A failed attempt, for an existing email or not (RF-22).
+          await tx.loginAttempt.create({
+            data: { email, at: now, outcome: 'FAILURE' },
+          });
+          return invalid;
+        }
+
+        // A success resets the count of failures (RF-22).
+        await tx.loginAttempt.create({
+          data: { email, at: now, outcome: 'SUCCESS' },
+        });
+        if (this.hasher.needsRehash(user.passwordHash)) {
+          await tx.user.update({
+            where: { id: user.id },
+            data: { passwordHash: await this.hasher.hash(password) },
+          });
+        }
+        const tokens = await this.createSession(tx, user.id, now);
+        return { kind: 'signed-in', tokens };
+      },
+      { timeout: 15_000 },
+    );
+
+    if (result.kind === 'invalid-credentials') {
+      throw invalidCredentials();
+    }
+    return result.tokens;
+  }
 
   /**
    * Starts a new session for `userId` (RF-5, RF-17): a Session row whose idle time
@@ -49,5 +127,18 @@ export class SessionsService {
       expiresIn: ACCESS_TOKEN_TTL_SECONDS,
       refreshToken,
     };
+  }
+
+  private async isSignInLocked(
+    tx: Prisma.TransactionClient,
+    email: string,
+    now: Date,
+  ): Promise<boolean> {
+    const lookback = SIGN_IN_LOCKOUT.windowMs + SIGN_IN_LOCKOUT.lockMs;
+    const attempts = await tx.loginAttempt.findMany({
+      where: { email, at: { gt: new Date(now.getTime() - lookback) } },
+      select: { at: true, outcome: true },
+    });
+    return lockedUntil(attempts, SIGN_IN_LOCKOUT, now) !== null;
   }
 }

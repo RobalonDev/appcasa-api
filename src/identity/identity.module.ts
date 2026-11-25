@@ -12,6 +12,7 @@ import { BUNDLED_LIST, LeakedPasswords } from './domain/leaked-passwords.js';
 import { RegistrationEmailJob } from './registration-email.job.js';
 import { RegistrationController } from './registration.controller.js';
 import { RegistrationService } from './registration.service.js';
+import { SessionsController } from './sessions.controller.js';
 import { SessionsService } from './sessions.service.js';
 
 /**
@@ -20,7 +21,7 @@ import { SessionsService } from './sessions.service.js';
  */
 @Module({
   imports: [MailModule],
-  controllers: [RegistrationController],
+  controllers: [RegistrationController, SessionsController],
   providers: [
     RegistrationService,
     RegistrationEmailJob,
