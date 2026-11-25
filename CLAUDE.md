@@ -59,11 +59,16 @@ src/
   main.ts             bootstrap (puerto desde config, shutdown hooks)
   app.module.ts       módulo raíz
   config/             esquema Zod de variables de entorno (env.ts)
-  database/           PrismaService (global)
+  clock/              Clock inyectable: única fuente de tiempo (ADR-0012)
+  http/               errores RFC 9457, configureApp(), @Public() (ADR-0011, ADR-0012)
+  database/           PrismaService (global) y lockKey() (ADR-0010)
+  mail/               MailSender: SMTP (nodemailer) y en memoria para tests (ADR-0009)
   health/             GET /health
+  identity/           cuentas, registro y sesiones (spec 001); domain/ y crypto/ puros
   generated/prisma/   cliente Prisma generado: NO editar, ignorado por git
 prisma/schema.prisma  modelos y migraciones (prisma/migrations)
-test/                 tests e2e
+test/                 tests e2e (test/support/: createTestApp, createIdentityTestApp)
+scripts/              secretos (keys:generate) y lista de contraseñas filtradas
 docs/adr/             Architecture Decision Records
 docs/specs/           specs SDD (NNN-capacidad/{spec,plan,tasks}.md) y plantillas
 docs/STATUS.md        estado del proyecto y errores a evitar (memoria de trabajo)

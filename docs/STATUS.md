@@ -10,10 +10,10 @@
 - Fase en curso: **fase 1 — identidad y hogares**.
 - Fase 1 dividida en specs: 001-authentication → 002-households → 003-invitations; además 004-account-management (recuperación/cambio de contraseña, nombre, borrado) antes de desplegar.
 - Desde 2026-11-23 Claude redacta los requisitos y el autor decide y revisa (variante prevista en ADR-0007).
-- Spec activa: **001-authentication**. Spec, plan (ADR-0008 a 0013) y tareas aprobados y en main (PR #4). 19 tareas en 3 entregas; todas las implementa Claude.
-  - **Entrega A (T1–T9) terminada** en `feat/001-authentication-a`, sin subir: pendiente de push y PR (el commit de T2 toca `.github/workflows/`).
-  - **Entrega B (T10–T14) terminada** en `feat/001-authentication-b` (sale de `-a`), sin subir.
-  - Entrega C en `feat/001-authentication-c` (sale de `-b`). Las ramas apiladas se rebasan sobre main al mergear cada una. Avance en `tasks.md`.
+- Spec activa: **001-authentication**. Spec, plan (ADR-0008 a 0013) y tareas aprobados y en main (PR #4). **Las 19 tareas están implementadas** (2026-11-25), en tres ramas locales apiladas y sin subir:
+  - A (T1–T9) `feat/001-authentication-a` · B (T10–T14) `feat/001-authentication-b` (sale de `-a`) · C (T15–T19) `feat/001-authentication-c` (sale de `-b`).
+  - 173 tests unitarios y 115 e2e en verde; e2e completos en ~20 s.
+  - Siguiente: el autor sube A y abre su PR (el commit de T2 toca `.github/workflows/`); tras mergear, B y C se rebasan sobre main. Después, validación (`/sdd-validate`, por crear).
 
 ## Decisiones clave
 
