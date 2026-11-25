@@ -10,10 +10,8 @@
 - Fase en curso: **fase 1 — identidad y hogares**.
 - Fase 1 dividida en specs: 001-authentication → 002-households → 003-invitations; además 004-account-management (recuperación/cambio de contraseña, nombre, borrado) antes de desplegar.
 - Desde 2026-11-23 Claude redacta los requisitos y el autor decide y revisa (variante prevista en ADR-0007).
-- Spec activa: **001-authentication**. Spec, plan (ADR-0008 a 0013) y tareas aprobados y en main (PR #4). **Las 19 tareas están implementadas** (2026-11-25), en tres ramas locales apiladas y sin subir:
-  - A (T1–T9) `feat/001-authentication-a` · B (T10–T14) `feat/001-authentication-b` (sale de `-a`) · C (T15–T19) `feat/001-authentication-c` (sale de `-b`).
-  - 173 tests unitarios y 115 e2e en verde; e2e completos en ~20 s.
-  - Siguiente: el autor sube A y abre su PR (el commit de T2 toca `.github/workflows/`); tras mergear, B y C se rebasan sobre main. Después, validación (`/sdd-validate`, por crear).
+- Spec activa: **001-authentication**. Spec, plan (ADR-0008 a 0013) y las 19 tareas, implementadas y en main: docs en la PR #4 y código en la PR #5 (2026-11-25; las tres entregas se mergearon juntas). CI en verde: 173 tests unitarios y 115 e2e.
+  - Siguiente: validación (`/sdd-validate`, por diseñar); al aprobarla, la spec pasa a `implementada`. Después, retrospectiva corta y spec 002.
 
 ## Decisiones clave
 
