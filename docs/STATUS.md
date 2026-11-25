@@ -10,7 +10,10 @@
 - Fase en curso: **fase 1 — identidad y hogares**.
 - Fase 1 dividida en specs: 001-authentication → 002-households → 003-invitations; además 004-account-management (recuperación/cambio de contraseña, nombre, borrado) antes de desplegar.
 - Desde 2026-11-23 Claude redacta los requisitos y el autor decide y revisa (variante prevista en ADR-0007).
-- Spec activa: **001-authentication** (aprobada el 2026-11-23; aclarada con D19–D21 el 2026-11-24; rama `feat/001-authentication`). **Plan aprobado** el 2026-11-24 (ADR-0008 a 0013). **Tareas aprobadas** el 2026-11-24: 19 en 3 entregas (A base y solicitud de registro, B completar el registro, C sesiones); todas las implementa Claude. Siguiente: mergear la PR de docs de esta rama → `feat/001-authentication-a` desde main → T1.
+- Spec activa: **001-authentication**. Spec, plan (ADR-0008 a 0013) y tareas aprobados y en main (PR #4). **Las 19 tareas están implementadas** (2026-11-25), en tres ramas locales apiladas y sin subir:
+  - A (T1–T9) `feat/001-authentication-a` · B (T10–T14) `feat/001-authentication-b` (sale de `-a`) · C (T15–T19) `feat/001-authentication-c` (sale de `-b`).
+  - 173 tests unitarios y 115 e2e en verde; e2e completos en ~20 s.
+  - Siguiente: el autor sube A y abre su PR (el commit de T2 toca `.github/workflows/`); tras mergear, B y C se rebasan sobre main. Después, validación (`/sdd-validate`, por crear).
 
 ## Decisiones clave
 
@@ -23,6 +26,8 @@ Ver `docs/adr/`. Resumen: NestJS 12 + Prisma 7 + Postgres 18 (0002), monolito mo
 - pnpm bloquea los scripts de instalación: aprobarlos en `pnpm-workspace.yaml` (`allowBuilds`).
 - `prisma.config.ts` usa `env('DATABASE_URL')`: `prisma generate` (y por tanto `pnpm install`) falla si no está definida. Relevante para Docker y CI.
 - Subir ficheros a `.github/workflows/` requiere el scope `workflow` en `gh`.
+- `AggregateError` en todos los e2e = Postgres no responde: Docker parado. `open -a Docker && pnpm infra:up`.
+- Al escribir ficheros, Claude puede convertir los escapes `\uXXXX` en caracteres invisibles (acentos combinados, espacios raros): en los tests de Unicode, comprobar con `cat -v` que el escape sigue escrito.
 - El reviewer (y cualquier subagente) ve el `CLAUDE.md` y sus imports, como este `STATUS.md`, tal como se cargaron al iniciar la sesión: si `STATUS.md` cambia, reiniciar la sesión para que lo vea actualizado.
 
 ## Pendiente

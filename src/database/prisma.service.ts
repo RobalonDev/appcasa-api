@@ -1,6 +1,6 @@
 import {
   Injectable,
-  type OnModuleDestroy,
+  type OnApplicationShutdown,
   type OnModuleInit,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -16,7 +16,7 @@ import type { Env } from '../config/env.js';
 @Injectable()
 export class PrismaService
   extends PrismaClient
-  implements OnModuleInit, OnModuleDestroy
+  implements OnModuleInit, OnApplicationShutdown
 {
   constructor(config: ConfigService<Env, true>) {
     super({
@@ -30,7 +30,9 @@ export class PrismaService
     await this.$connect();
   }
 
-  async onModuleDestroy(): Promise<void> {
+  // Disconnect in the last shutdown phase: background work (e.g. queued auth emails)
+  // drains in `beforeApplicationShutdown`, which Nest runs after `onModuleDestroy`.
+  async onApplicationShutdown(): Promise<void> {
     await this.$disconnect();
   }
 }

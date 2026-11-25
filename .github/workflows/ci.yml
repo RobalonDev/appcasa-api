@@ -36,6 +36,9 @@ jobs:
     env:
       NODE_ENV: test
       DATABASE_URL: postgresql://appcasa:appcasa@localhost:5432/appcasa?schema=public
+      # E2E tests replace the mail sender with an in-memory one: nothing listens here.
+      SMTP_URL: smtp://localhost:1025
+      MAIL_FROM: "AppCasa <no-reply@appcasa.local>"
 
     steps:
       - uses: actions/checkout@v7
@@ -50,6 +53,10 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      # Fresh, throwaway auth secrets for this run (ADR-0008); never stored.
+      - name: Generate auth secrets
+        run: node scripts/generate-secrets.ts >> "$GITHUB_ENV"
 
       - name: Typecheck
         run: pnpm typecheck

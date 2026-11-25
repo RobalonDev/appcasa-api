@@ -46,7 +46,7 @@ pnpm db:generate          # regenerar cliente tras cambiar schema.prisma
 pnpm db:studio            # explorar la BD
 ```
 
-Primera vez: `cp .env.example .env && pnpm install && pnpm infra:up`.
+Primera vez: `cp .env.example .env && pnpm install && pnpm --silent keys:generate >> .env && pnpm infra:up`.
 
 ## Stack
 
@@ -59,11 +59,16 @@ src/
   main.ts             bootstrap (puerto desde config, shutdown hooks)
   app.module.ts       módulo raíz
   config/             esquema Zod de variables de entorno (env.ts)
-  database/           PrismaService (global)
+  clock/              Clock inyectable: única fuente de tiempo (ADR-0012)
+  http/               errores RFC 9457, configureApp(), @Public() (ADR-0011, ADR-0012)
+  database/           PrismaService (global) y lockKey() (ADR-0010)
+  mail/               MailSender: SMTP (nodemailer) y en memoria para tests (ADR-0009)
   health/             GET /health
+  identity/           cuentas, registro y sesiones (spec 001); domain/ y crypto/ puros
   generated/prisma/   cliente Prisma generado: NO editar, ignorado por git
 prisma/schema.prisma  modelos y migraciones (prisma/migrations)
-test/                 tests e2e
+test/                 tests e2e (test/support/: createTestApp, createIdentityTestApp)
+scripts/              secretos (keys:generate) y lista de contraseñas filtradas
 docs/adr/             Architecture Decision Records
 docs/specs/           specs SDD (NNN-capacidad/{spec,plan,tasks}.md) y plantillas
 docs/STATUS.md        estado del proyecto y errores a evitar (memoria de trabajo)
@@ -78,10 +83,10 @@ docs/STATUS.md        estado del proyecto y errores a evitar (memoria de trabajo
 - **ESM:** los imports relativos terminan en `.js`. Usa `import type` para lo que solo es tipo, **excepto** en los tipos que Nest inyecta por constructor (necesitan existir en runtime para los metadatos de DI).
 - **TypeScript:** sin `any` (usa `unknown` y estrecha). `noUncheckedIndexedAccess` está activo: los accesos por índice pueden ser `undefined`.
 - **Configuración:** toda variable de entorno nueva se añade a `src/config/env.ts` y a `.env.example`. Se lee con `ConfigService<Env, true>` y `get('X', { infer: true })`, nunca con `process.env` directamente en la app.
-- **Base de datos:** cambios de esquema solo mediante migraciones de Prisma. Nunca editar una migración ya aplicada; crear una nueva.
+- **Base de datos:** cambios de esquema solo mediante migraciones de Prisma. Nunca editar una migración ya aplicada; crear una nueva. Tablas y columnas en `snake_case` (`@@map`/`@map`), ids UUIDv7 (ADR-0011) y ninguna fecha por defecto en la BD: todas salen de `Clock` (ADR-0012). Lo que Prisma no sabe expresar (p. ej. un índice único parcial) va como SQL en la migración, con un comentario.
 - **Arquitectura (ADR-0003):** un módulo Nest por bounded context. Un módulo no accede a tablas ni providers internos de otro: usa su servicio exportado o sus eventos.
 - **Multi-tenancy (ADR-0006):** todo dato de dominio pertenece a un hogar (`householdId`) y toda operación verifica la membresía del usuario en ese hogar. Excepción: la identidad (cuentas y sesiones, spec 001) es global y no pertenece a ningún hogar.
-- **Tests:** unitarios junto al código (`*.spec.ts`), e2e en `test/`. Lógica de dominio siempre con tests.
+- **Tests:** unitarios junto al código (`*.spec.ts`), e2e en `test/`. Lógica de dominio siempre con tests. Los e2e arrancan la app con `createTestApp()` (`test/support/`) y se aíslan con datos únicos (p. ej. `uniqueEmail()`), sin vaciar tablas.
 
 ## Hoja de ruta
 

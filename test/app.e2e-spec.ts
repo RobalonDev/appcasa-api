@@ -3,9 +3,10 @@ import type { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import type { App } from 'supertest/types.js';
 import { AppModule } from './../src/app.module.js';
+import { configureApp } from './../src/http/configure-app.js';
 
 // Requires the local database: `pnpm infra:up`.
-describe('Health (e2e)', () => {
+describe('App (e2e)', () => {
   let app: INestApplication<App>;
 
   beforeAll(async () => {
@@ -14,6 +15,7 @@ describe('Health (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    configureApp(app);
     await app.init();
   });
 
@@ -26,5 +28,33 @@ describe('Health (e2e)', () => {
       .get('/health')
       .expect(200)
       .expect({ status: 'ok', database: 'up' });
+  });
+
+  it('answers an unknown route with an RFC 9457 problem (ADR-0011)', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/does-not-exist')
+      .expect(404)
+      .expect('Content-Type', /application\/problem\+json/);
+
+    expect(response.body).toMatchObject({
+      type: 'about:blank',
+      title: 'Not Found',
+      status: 404,
+      code: 'NOT_FOUND',
+    });
+  });
+
+  it('answers a malformed JSON body with VALIDATION_FAILED (ADR-0011)', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/does-not-exist')
+      .set('Content-Type', 'application/json')
+      .send('{"email": ')
+      .expect(400)
+      .expect('Content-Type', /application\/problem\+json/);
+
+    expect(response.body).toMatchObject({
+      code: 'VALIDATION_FAILED',
+      errors: [{ field: 'body', code: 'INVALID_FIELD' }],
+    });
   });
 });

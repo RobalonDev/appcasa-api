@@ -80,7 +80,7 @@ ADR-0003: un módulo por bounded context, y ningún módulo accede a lo interno 
   - `SMTP_URL` y `MAIL_FROM`.
 - **Generación de claves:**
   - en local, `pnpm keys:generate` imprime las líneas para copiarlas a `.env`;
-  - en CI, un paso las genera con `openssl`.
+  - en CI, un paso ejecuta el mismo script (`node scripts/generate-secrets.ts >> "$GITHUB_ENV"`) con secretos de usar y tirar.
 - **`docker-compose.yml`:** servicio `mailpit`, con versión fijada. SMTP en el puerto 1025 y web en el 8025.
 - **`package.json`:** `engines.node` sube a la primera versión 24.x que trae `crypto.argon2` (se comprueba al implementar; en local hay 24.19).
 - **`vitest.config.e2e.ts`:** `fileParallelism: false`, porque los tests comparten base de datos y reloj controlable.
@@ -402,7 +402,7 @@ Referencia de cobertura: una fila por cada RF y RNF activo de la spec.
 - Se hacen 100 peticiones por caso, cada una con un email distinto, y la diferencia entre medias no puede superar 50 ms.
 - Se incluyen también los casos en que se aplica un límite o un bloqueo (RF-12, 15 y 42).
 - Las cuentas de prueba se crean directamente en la BD, con un hash ya calculado.
-- El `MailSender` falso tarda unos 300 ms a propósito, para demostrar que la respuesta no espera al envío.
+- El `MailSender` falso tarda 100 ms a propósito, para demostrar que la respuesta no espera al envío: basta con superar el umbral de 50 ms, y con más el test tardaría bastante más en vaciar la cola (ajustado en T19).
 
 ## Oportunidades de aprendizaje
 
@@ -434,7 +434,7 @@ Claude se encarga del resto:
 - RNF-2 y los parámetros de argon2: si se cambian, las cuentas con el hash antiguo tardan distinto que un email sin cuenta hasta que vuelven a iniciar sesión. Se acepta mientras los parámetros no cambien; antes de cambiarlos, hay que revisarlo.
 - La lista de contraseñas filtradas solo cubre las más frecuentes (E1).
 - Formato del email: se rechazan algunas direcciones válidas pero raras (E2).
-- `@types/nodemailer` va por la versión 8.0.2: al instalar hay que comprobar que cubre nodemailer 10.
+- ~~`@types/nodemailer` va por la versión 8.0.2~~ Resuelto en T4: nodemailer 10 trae sus propios tipos.
 - Los datos de autenticación, incluidas las reservas `PENDING`, crecen sin limpiarse hasta la fase 2 (E5). Hay que limpiarlos antes de desplegar.
 
 ## Estimación
