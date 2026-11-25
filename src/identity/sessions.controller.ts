@@ -19,6 +19,10 @@ const signInSchema = z
     }),
   );
 
+const refreshSchema = z.object({
+  refreshToken: z.string({ error: 'INVALID_FIELD' }),
+});
+
 @Controller('auth/sessions')
 export class SessionsController {
   constructor(private readonly sessions: SessionsService) {}
@@ -31,5 +35,18 @@ export class SessionsController {
     @Body({ schema: signInSchema }) body: z.output<typeof signInSchema>,
   ): Promise<SessionTokens> {
     return this.sessions.signIn(body.email, body.password);
+  }
+
+  /**
+   * Renews a session (RF-20, RF-21, RF-36). Public for the guard: it is authenticated
+   * by the refresh token itself, even when the access token has expired (spec D21).
+   */
+  @Public()
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  refresh(
+    @Body({ schema: refreshSchema }) body: z.output<typeof refreshSchema>,
+  ): Promise<SessionTokens> {
+    return this.sessions.refresh(body.refreshToken);
   }
 }

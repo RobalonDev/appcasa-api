@@ -98,7 +98,7 @@ Los RF con parte unitaria y parte e2e se cierran en la entrega donde existe su r
   - Plan: §Flujos (Iniciar sesión); §Contrato de API.
   - Ficheros: `sessions.controller.ts`, `sessions.service.ts`, `test/identity/sign-in.e2e-spec.ts`.
   - Hecho cuando: e2e `RF-13`, `RF-17`, `RF-22` (bordes de 15 min; sin cuenta; contraseña correcta bloqueada; un éxito reinicia), `RF-31`, `RF-26`, `RF-35` y `RF-39` (registro NFC, login NFD) en verde; re-hash al cambiar parámetros; `pnpm check` y `pnpm test:e2e` pasan.
-- [ ] **T16. Renovar la sesión.** RF-20, RF-21, RF-36, RNF-4 · Responsable: claude
+- [x] **T16. Renovar la sesión.** RF-20, RF-21, RF-36, RNF-4 · Responsable: claude
   - Plan: §Flujos (Sesiones: orden de bloqueo; Renovar la sesión); §Modelo de datos (caducidad).
   - Ficheros: `sessions.service.ts`, `sessions.controller.ts`, `test/identity/refresh.e2e-spec.ts`.
   - Hecho cuando: e2e `RF-20` (renueva a 30 d; falla a 30 d + 5 min + 1 s), `RF-21` (bordes de 90 d), `RF-36` (refresh reutilizado finaliza esa sesión; las demás siguen; dos renovaciones simultáneas) y `RNF-4` (renovar cruzado con un cierre no produce un JWT posterior al cierre) en verde; `pnpm check` y `pnpm test:e2e` pasan.
