@@ -64,7 +64,7 @@ Los RF con parte unitaria y parte e2e se cierran en la entrega donde existe su r
   - Plan: §Flujos (Solicitud de registro); §Contrato de API; ADR-0013; §Seguridad (contenido de los emails).
   - Ficheros: `src/identity/registration.controller.ts`, `registration.service.ts`, `registration-email.job.ts` (`AuthEmailJobs` con cola acotada y `drain()`), `identity.module.ts`, `test/identity/registration-request.e2e-spec.ts`.
   - Hecho cuando: e2e `RF-1` (código enviado, sin cuenta), `RF-6` (misma respuesta con y sin cuenta), `RF-7` (aviso en vez de código), `RF-11` (al confirmar, el anterior queda invalidado; mientras está reservado, sigue activo) y `RF-35` (email no válido) en verde; cola llena descarta el trabajo; `pnpm check` y `pnpm test:e2e` pasan.
-- [ ] **T9. Solicitar el registro: límites y fallos.** RF-12, RF-32, RF-38, RF-42 · Responsable: claude
+- [x] **T9. Solicitar el registro: límites y fallos.** RF-12, RF-32, RF-38, RF-42 · Responsable: claude
   - Plan: §Flujos (Solicitud de registro, Límites); ADR-0013; spec D19.
   - Ficheros: `registration-email.job.ts`, `test/identity/registration-limits.e2e-spec.ts`.
   - Hecho cuando: tests `RF-12` (2.ª en < 1 min y 6.ª en < 1 h no envían; avisos y códigos comparten límite; un envío en curso o incierto cuenta), `RF-32`, `RF-38` (fallo simulado: misma respuesta, el anterior sigue, no cuenta) y `RF-42` (bloqueo de RF-15 sembrado en BD: no envía, no consume cupo, no invalida) en verde; `pnpm check` y `pnpm test:e2e` pasan.
