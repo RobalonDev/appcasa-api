@@ -71,7 +71,7 @@ Los RF con parte unitaria y parte e2e se cierran en la entrega donde existe su r
 
 ## Entrega B — Completar el registro (`feat/001-authentication-b`)
 
-- [ ] **T10. Política de contraseñas y lista filtrada.** RF-23, RF-24, RF-25, RF-39, RNF-5 · Responsable: claude
+- [x] **T10. Política de contraseñas y lista filtrada.** RF-23, RF-24, RF-25, RF-39, RNF-5 · Responsable: claude
   - Plan: §Flujos (Normalización); decisión E1.
   - Ficheros: `src/identity/domain/password-policy.ts` (+ `.spec.ts`), `src/identity/data/leaked-passwords.txt`, `scripts/build-leaked-passwords.ts`.
   - Hecho cuando: tests unitarios `RF-23` (11/129 no; 12/128 sí), `RF-24`, `RF-25`, `RF-39` (NFC antes de comprobar) y `RNF-5` (sin red) en verde; el script regenera la lista; `pnpm check` pasa.
