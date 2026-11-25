@@ -125,39 +125,14 @@ export class SessionsService {
    * and a sign-out of the same session run one after the other (RNF-4).
    */
   async refresh(refreshToken: string): Promise<SessionTokens> {
-    const tokenHash = this.tokens.hashRefreshToken(refreshToken);
     const result = await this.prisma.$transaction(
       async (tx): Promise<RenewResult> => {
-        const rejected = { kind: 'rejected' } as const;
-        const found = await tx.refreshToken.findUnique({
-          where: { tokenHash },
-          select: { sessionId: true },
-        });
-        if (!found) {
-          return rejected;
-        }
-        await lockSession(tx, found.sessionId);
         const now = this.clock.now();
-        // Read again under the lock: a concurrent renewal or sign-out has finished.
-        const token = await tx.refreshToken.findUniqueOrThrow({
-          where: { tokenHash },
-          include: { session: true },
-        });
-        const { session } = token;
-
-        if (token.usedAt !== null) {
-          if (session.endedAt === null) {
-            await tx.session.update({
-              where: { id: session.id },
-              data: { endedAt: now, endReason: 'COPIED' },
-            });
-          }
-          return rejected;
+        const locked = await this.lockByRefreshToken(tx, refreshToken, now);
+        if (!locked) {
+          return { kind: 'rejected' };
         }
-        if (session.endedAt !== null || isSessionExpired(session, now)) {
-          return rejected;
-        }
-
+        const { token, session } = locked;
         await tx.refreshToken.update({
           where: { id: token.id },
           data: { usedAt: now },
@@ -180,6 +155,90 @@ export class SessionsService {
       throw authenticationRequired();
     }
     return result.tokens;
+  }
+
+  /**
+   * Signs out the session that owns `refreshToken`, leaving the user's other sessions
+   * alone (RF-18). Works with an expired access token (spec D21). Same checks as a
+   * renewal: a reused token ends the session as copied (RF-36) and is rejected.
+   */
+  async signOut(refreshToken: string): Promise<void> {
+    const signedOut = await this.prisma.$transaction(async (tx) => {
+      const now = this.clock.now();
+      const locked = await this.lockByRefreshToken(tx, refreshToken, now);
+      if (!locked) {
+        return false;
+      }
+      await tx.session.update({
+        where: { id: locked.session.id },
+        data: { endedAt: now, endReason: 'LOGOUT' },
+      });
+      return true;
+    });
+    if (!signedOut) {
+      throw authenticationRequired();
+    }
+  }
+
+  /**
+   * Ends every session the user has right now (RF-19). Sessions created afterwards are
+   * not affected. Access tokens already issued keep working for at most 5 minutes (RNF-4).
+   */
+  async signOutEverywhere(userId: string): Promise<void> {
+    await this.prisma.$transaction(async (tx) => {
+      const now = this.clock.now();
+      const open = await tx.$queryRaw<{ id: string }[]>`
+        SELECT id FROM sessions
+        WHERE user_id = ${userId}::uuid AND ended_at IS NULL
+        FOR UPDATE`;
+      await tx.session.updateMany({
+        where: { id: { in: open.map((row) => row.id) } },
+        data: { endedAt: now, endReason: 'LOGOUT_ALL' },
+      });
+    });
+  }
+
+  /**
+   * Finds the session of a refresh token and locks it, session row first (plan
+   * «Sesiones: orden de bloqueo»), then reads the token and the session again under
+   * the lock. Returns them only if the token is the current one of an open, unexpired
+   * session. A token that was already used reveals a copy: its session is ended as
+   * COPIED (RF-36) and the caller commits that before answering.
+   */
+  private async lockByRefreshToken(
+    tx: Prisma.TransactionClient,
+    refreshToken: string,
+    now: Date,
+  ) {
+    const tokenHash = this.tokens.hashRefreshToken(refreshToken);
+    const found = await tx.refreshToken.findUnique({
+      where: { tokenHash },
+      select: { sessionId: true },
+    });
+    if (!found) {
+      return null;
+    }
+    await lockSession(tx, found.sessionId);
+    // Read again under the lock: a concurrent renewal or sign-out has finished.
+    const token = await tx.refreshToken.findUniqueOrThrow({
+      where: { tokenHash },
+      include: { session: true },
+    });
+    const { session } = token;
+
+    if (token.usedAt !== null) {
+      if (session.endedAt === null) {
+        await tx.session.update({
+          where: { id: session.id },
+          data: { endedAt: now, endReason: 'COPIED' },
+        });
+      }
+      return null;
+    }
+    if (session.endedAt !== null || isSessionExpired(session, now)) {
+      return null;
+    }
+    return { token, session };
   }
 
   /** A new refresh token for the session (stored only as a hash) and an access token. */

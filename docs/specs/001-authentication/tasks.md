@@ -102,7 +102,7 @@ Los RF con parte unitaria y parte e2e se cierran en la entrega donde existe su r
   - Plan: §Flujos (Sesiones: orden de bloqueo; Renovar la sesión); §Modelo de datos (caducidad).
   - Ficheros: `sessions.service.ts`, `sessions.controller.ts`, `test/identity/refresh.e2e-spec.ts`.
   - Hecho cuando: e2e `RF-20` (renueva a 30 d; falla a 30 d + 5 min + 1 s), `RF-21` (bordes de 90 d), `RF-36` (refresh reutilizado finaliza esa sesión; las demás siguen; dos renovaciones simultáneas) y `RNF-4` (renovar cruzado con un cierre no produce un JWT posterior al cierre) en verde; `pnpm check` y `pnpm test:e2e` pasan.
-- [ ] **T17. Cerrar sesión y cerrar todas.** RF-18, RF-19, RF-36, RNF-1, RNF-4 · Responsable: claude
+- [x] **T17. Cerrar sesión y cerrar todas.** RF-18, RF-19, RF-36, RNF-1, RNF-4 · Responsable: claude
   - Plan: §Flujos (Cerrar sesión; Guard global); decisión Q2.
   - Ficheros: `sessions.controller.ts`, `sessions.service.ts`, `test/identity/sign-out.e2e-spec.ts`.
   - Hecho cuando: e2e `RF-18` (también con el JWT caducado), `RF-19` (las posteriores siguen), `RF-36` (cerrar con un refresh ya usado), `RNF-4` (tras cerrar, el JWT vale ≤ 5 min y el refresh deja de servir al momento) y `RNF-1` (todas las rutas del módulo sin credencial → 401 salvo las públicas) en verde; `pnpm check` y `pnpm test:e2e` pasan.

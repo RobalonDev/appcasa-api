@@ -1,6 +1,17 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  HttpCode,
+  HttpStatus,
+  Post,
+} from '@nestjs/common';
 import { z } from 'zod';
 import { Public } from '../http/public.decorator.js';
+import {
+  type AuthenticatedSession,
+  CurrentSession,
+} from './current-session.decorator.js';
 import { emailSchema } from './domain/email.js';
 import { type SessionTokens, SessionsService } from './sessions.service.js';
 
@@ -48,5 +59,24 @@ export class SessionsController {
     @Body({ schema: refreshSchema }) body: z.output<typeof refreshSchema>,
   ): Promise<SessionTokens> {
     return this.sessions.refresh(body.refreshToken);
+  }
+
+  /** Signs out this session only (RF-18), with its refresh token (plan Q2, spec D21). */
+  @Public()
+  @Delete('current')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  signOut(
+    @Body({ schema: refreshSchema }) body: z.output<typeof refreshSchema>,
+  ): Promise<void> {
+    return this.sessions.signOut(body.refreshToken);
+  }
+
+  /** Signs out every session of the caller (RF-19); needs a valid access token. */
+  @Delete()
+  @HttpCode(HttpStatus.NO_CONTENT)
+  signOutEverywhere(
+    @CurrentSession() session: AuthenticatedSession,
+  ): Promise<void> {
+    return this.sessions.signOutEverywhere(session.userId);
   }
 }
