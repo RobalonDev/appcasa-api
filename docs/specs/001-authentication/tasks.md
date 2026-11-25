@@ -75,7 +75,7 @@ Los RF con parte unitaria y parte e2e se cierran en la entrega donde existe su r
   - Plan: §Flujos (Normalización); decisión E1.
   - Ficheros: `src/identity/domain/password-policy.ts` (+ `.spec.ts`), `src/identity/data/leaked-passwords.txt`, `scripts/build-leaked-passwords.ts`.
   - Hecho cuando: tests unitarios `RF-23` (11/129 no; 12/128 sí), `RF-24`, `RF-25`, `RF-39` (NFC antes de comprobar) y `RNF-5` (sin red) en verde; el script regenera la lista; `pnpm check` pasa.
-- [ ] **T11. Validación del nombre visible.** RF-27 · Responsable: claude
+- [x] **T11. Validación del nombre visible.** RF-27 · Responsable: claude
   - Plan: §Flujos (Normalización).
   - Ficheros: `src/identity/domain/display-name.ts` (+ `.spec.ts`).
   - Hecho cuando: tests unitarios `RF-27` (1/31 caracteres, control, formato, separadores, uso privado, sin asignar; tabulador en extremos eliminado y en medio rechazado) en verde; `pnpm check` pasa.
