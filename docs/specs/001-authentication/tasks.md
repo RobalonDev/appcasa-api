@@ -87,9 +87,9 @@ Los RF con parte unitaria y parte e2e se cierran en la entrega donde existe su r
   - Plan: §Flujos (Completar el registro, pasos 1–5; Términos); decisión Q3.
   - Ficheros: `registration.service.ts`, `registration.controller.ts`, `test/identity/registration-complete.e2e-spec.ts`.
   - Hecho cuando: e2e `RF-37` (solo `INVALID_EMAIL`, también con contraseña ausente), `RF-28` (el código sigue y no cuenta), `RF-23`/`RF-24`/`RF-27`/`RF-35` por HTTP, `RF-9` (bordes de 15 min), `RF-10` (4 fallos aún sirve; 5 no), `RF-11` (el anterior ya no sirve), `RF-15` (bordes de 24 h), `RF-16` (todos los casos, incluidos vacío, 5 dígitos, letras y ausente) y `RF-41` en verde; `pnpm check` y `pnpm test:e2e` pasan.
-- [ ] **T14. Completar el registro: cuenta y sesión.** RF-4, RF-5, RF-26, RF-29, RF-30, D20 · Responsable: claude
+- [x] **T14. Completar el registro: cuenta y sesión.** RF-4, RF-5, RF-26, RF-29, RF-30, D20 · Responsable: claude
   - Plan: §Flujos (Completar el registro, paso 6 y notas).
-  - Ficheros: `registration.service.ts`, `test/identity/registration-complete.e2e-spec.ts`.
+  - Ficheros: `registration.service.ts`, `test/identity/registration-account.e2e-spec.ts`.
   - Hecho cuando: e2e `RF-4`, `RF-5` (tokens; el acceso sirve en `/__test/session`), `RF-26` (registro con mayúsculas/espacios), `RF-29`, `RF-30` (N simultáneas → una cuenta) y `D20` (con RF-22 activo se crea cuenta y sesión) en verde; `pnpm check` y `pnpm test:e2e` pasan.
 
 ## Entrega C — Sesiones y requisitos globales (`feat/001-authentication-c`)

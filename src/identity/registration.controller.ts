@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { Public } from '../http/public.decorator.js';
 import { emailSchema } from './domain/email.js';
 import { RegistrationService } from './registration.service.js';
+import type { SessionTokens } from './sessions.service.js';
 
 const registrationRequestSchema = z.object({ email: emailSchema });
 
@@ -25,13 +26,13 @@ export class RegistrationController {
   }
 
   /**
-   * Step 2 of registration (RF-4…RF-41). The body is validated by the service, not by a
+   * Step 2 of registration (RF-4…RF-41); answers the new session's tokens (RF-5). The body is validated by the service, not by a
    * schema, to follow the order of RF-37 and map every problem to the spec (plan Q3).
    */
   @Public()
   @Post('registrations')
   @HttpCode(HttpStatus.CREATED)
-  async completeRegistration(@Body() body: unknown): Promise<void> {
-    await this.registration.completeRegistration(body);
+  completeRegistration(@Body() body: unknown): Promise<SessionTokens> {
+    return this.registration.completeRegistration(body);
   }
 }

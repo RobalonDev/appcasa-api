@@ -12,6 +12,7 @@ import { normalizeEmail } from './domain/email.js';
 import { LeakedPasswords } from './domain/leaked-passwords.js';
 import { checkPassword } from './domain/password-policy.js';
 import { EMAIL_LOCK } from './email-lock.js';
+import { type SessionTokens, SessionsService } from './sessions.service.js';
 import { isVerificationLocked } from './verification-lock.js';
 
 /** RF-9: a code stops working when more than 15 minutes have passed since it was issued. */
@@ -28,7 +29,8 @@ interface RegistrationData {
   code: string | null;
 }
 
-type CompletionResult = { kind: 'created' } | { kind: 'invalid-code' };
+type CompletionResult =
+  { kind: 'created'; tokens: SessionTokens } | { kind: 'invalid-code' };
 
 function validationFailed(errors: FieldError[]): ProblemException {
   return new ProblemException({
@@ -61,6 +63,7 @@ export class RegistrationService {
     private readonly leaked: LeakedPasswords,
     private readonly hasher: PasswordHasher,
     private readonly tokens: TokensService,
+    private readonly sessions: SessionsService,
   ) {}
 
   /**
@@ -77,7 +80,7 @@ export class RegistrationService {
    * to an error of the spec (plan Q3). Nothing is thrown inside the transaction:
    * the failure counters it writes must be committed (plan, «Flujos y consistencia»).
    */
-  async completeRegistration(body: unknown): Promise<void> {
+  async completeRegistration(body: unknown): Promise<SessionTokens> {
     const data = this.validate(body);
     const result = await this.prisma.$transaction(
       (tx) => this.evaluate(tx, data),
@@ -86,6 +89,7 @@ export class RegistrationService {
     if (result.kind === 'invalid-code') {
       throw invalidVerificationCode();
     }
+    return result.tokens;
   }
 
   /** RF-37: email first; then display name and password together (RF-27, RF-23, RF-24). */
@@ -180,7 +184,8 @@ export class RegistrationService {
       return invalid;
     }
 
-    await tx.user.create({
+    // RF-4. The RF-22 sign-in lockout plays no part here (spec D20).
+    const user = await tx.user.create({
       data: {
         email: data.email,
         displayName: data.displayName,
@@ -188,6 +193,14 @@ export class RegistrationService {
         createdAt: now,
       },
     });
-    return { kind: 'created' };
+    // RF-29: no code of this email works once the account exists. Codes still in
+    // flight are dropped when their send is confirmed (registration-email.job.ts).
+    await tx.verificationCode.updateMany({
+      where: { email: data.email, status: 'ACTIVE' },
+      data: { status: 'INVALIDATED' },
+    });
+    // RF-5: the new user is signed in, atomically with the account.
+    const tokens = await this.sessions.createSession(tx, user.id, now);
+    return { kind: 'created', tokens };
   }
 }
