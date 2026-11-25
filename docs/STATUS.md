@@ -12,7 +12,8 @@
 - Desde 2026-11-23 Claude redacta los requisitos y el autor decide y revisa (variante prevista en ADR-0007).
 - Spec activa: **001-authentication**. Spec, plan (ADR-0008 a 0013) y tareas aprobados y en main (PR #4). 19 tareas en 3 entregas; todas las implementa Claude.
   - **Entrega A (T1–T9) terminada** en `feat/001-authentication-a`, sin subir: pendiente de push y PR (el commit de T2 toca `.github/workflows/`).
-  - Entregas B y C en ramas locales apiladas (`-b` sale de `-a`, `-c` de `-b`); se rebasan sobre main al mergear cada una. Avance en `tasks.md`.
+  - **Entrega B (T10–T14) terminada** en `feat/001-authentication-b` (sale de `-a`), sin subir.
+  - Entrega C en `feat/001-authentication-c` (sale de `-b`). Las ramas apiladas se rebasan sobre main al mergear cada una. Avance en `tasks.md`.
 
 ## Decisiones clave
 
