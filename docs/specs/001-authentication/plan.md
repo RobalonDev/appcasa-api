@@ -402,7 +402,7 @@ Referencia de cobertura: una fila por cada RF y RNF activo de la spec.
 - Se hacen 100 peticiones por caso, cada una con un email distinto, y la diferencia entre medias no puede superar 50 ms.
 - Se incluyen también los casos en que se aplica un límite o un bloqueo (RF-12, 15 y 42).
 - Las cuentas de prueba se crean directamente en la BD, con un hash ya calculado.
-- El `MailSender` falso tarda unos 300 ms a propósito, para demostrar que la respuesta no espera al envío.
+- El `MailSender` falso tarda 100 ms a propósito, para demostrar que la respuesta no espera al envío: basta con superar el umbral de 50 ms, y con más el test tardaría bastante más en vaciar la cola (ajustado en T19).
 
 ## Oportunidades de aprendizaje
 

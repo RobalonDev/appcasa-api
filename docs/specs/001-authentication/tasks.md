@@ -110,7 +110,7 @@ Los RF con parte unitaria y parte e2e se cierran en la entrega donde existe su r
   - Plan: §Flujos (Límites); ADR-0010, ADR-0013.
   - Ficheros: `test/identity/concurrency.e2e-spec.ts`.
   - Hecho cuando: e2e `RNF-3` (ráfagas simultáneas contra RF-10, RF-12, RF-15 y RF-22: nunca se supera el límite) en verde; `pnpm test:e2e` pasa.
-- [ ] **T19. Tiempos de respuesta.** RNF-2 · Responsable: claude
+- [x] **T19. Tiempos de respuesta.** RNF-2 · Responsable: claude
   - Plan: §Estrategia de tests (Cómo se mide RNF-2); decisión E4.
   - Ficheros: `test/identity/timing.e2e-spec.ts`.
   - Hecho cuando: e2e `RNF-2` (100 peticiones por caso; diferencia de medias ≤ 50 ms en las tres operaciones, también con límites y bloqueos) en verde en local y en CI; `pnpm test:e2e` pasa.
