@@ -2,7 +2,7 @@ import { BUNDLED_LIST, LeakedPasswords } from './leaked-passwords.js';
 
 describe('LeakedPasswords', () => {
   it('finds listed passwords, in NFC', () => {
-    const list = new LeakedPasswords(['contraseña123']); // stored decomposed
+    const list = new LeakedPasswords(['contrasen\u0303a123']); // stored decomposed
     expect(list.has('contraseña123')).toBe(true);
     expect(list.has('otra cosa')).toBe(false);
   });

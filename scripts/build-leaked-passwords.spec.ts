@@ -13,7 +13,7 @@ describe('filterLeakedPasswords (plan 001, decision E1)', () => {
     const lines = [
       'qwerty123456',
       '',
-      'contraseña123',
+      'contrasen\u0303a123',
       'contraseña123',
       'abcdefghijkl',
     ];
@@ -25,7 +25,7 @@ describe('filterLeakedPasswords (plan 001, decision E1)', () => {
   });
 
   it('counts characters after NFC, as RF-23 does', () => {
-    const decomposed = 'ñ'.repeat(12); // 24 code points, 12 characters
+    const decomposed = 'n\u0303'.repeat(12); // 24 code points, 12 characters
     expect(filterLeakedPasswords([decomposed])).toEqual(['ñ'.repeat(12)]);
   });
 

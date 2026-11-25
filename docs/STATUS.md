@@ -26,6 +26,7 @@ Ver `docs/adr/`. Resumen: NestJS 12 + Prisma 7 + Postgres 18 (0002), monolito mo
 - `prisma.config.ts` usa `env('DATABASE_URL')`: `prisma generate` (y por tanto `pnpm install`) falla si no está definida. Relevante para Docker y CI.
 - Subir ficheros a `.github/workflows/` requiere el scope `workflow` en `gh`.
 - `AggregateError` en todos los e2e = Postgres no responde: Docker parado. `open -a Docker && pnpm infra:up`.
+- Al escribir ficheros, Claude puede convertir los escapes `\uXXXX` en caracteres invisibles (acentos combinados, espacios raros): en los tests de Unicode, comprobar con `cat -v` que el escape sigue escrito.
 - El reviewer (y cualquier subagente) ve el `CLAUDE.md` y sus imports, como este `STATUS.md`, tal como se cargaron al iniciar la sesión: si `STATUS.md` cambia, reiniciar la sesión para que lo vea actualizado.
 
 ## Pendiente

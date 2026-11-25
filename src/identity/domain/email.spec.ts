@@ -15,7 +15,7 @@ describe('normalizeEmail', () => {
     });
 
     it('ignores whitespace of any kind at both ends', () => {
-      const spaces = [' ', '\t', '\n', '\r\n', ' ', ' ', '　'];
+      const spaces = [' ', '\t', '\n', '\r\n', '\u00a0', '\u2003', '\u3000'];
       for (const space of spaces) {
         expect(normalizeEmail(`${space}ana@example.com${space}`)).toBe(
           'ana@example.com',
@@ -24,7 +24,7 @@ describe('normalizeEmail', () => {
     });
 
     it('does not treat U+FEFF (a format character, not whitespace) as space', () => {
-      expect(normalizeEmail('﻿ana@example.com')).toBeNull();
+      expect(normalizeEmail('\ufeffana@example.com')).toBeNull();
     });
 
     it('does not unify aliases (spec D9)', () => {

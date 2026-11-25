@@ -2,7 +2,7 @@ import { countCharacters, trimWhiteSpace } from './text.js';
 
 describe('trimWhiteSpace', () => {
   it('removes characters with the Unicode White_Space property at both ends', () => {
-    expect(trimWhiteSpace(' \t ana  　')).toBe('ana');
+    expect(trimWhiteSpace('\u00a0\t ana \u2028\u3000')).toBe('ana');
   });
 
   it('keeps whitespace inside', () => {
@@ -10,8 +10,8 @@ describe('trimWhiteSpace', () => {
   });
 
   it('keeps U+FEFF, which JavaScript trim() would remove but is not White_Space', () => {
-    expect(trimWhiteSpace('﻿ana')).toBe('﻿ana');
-    expect('﻿ana'.trim()).toBe('ana');
+    expect(trimWhiteSpace('\ufeffana')).toBe('\ufeffana');
+    expect('\ufeffana'.trim()).toBe('ana');
   });
 });
 
@@ -22,7 +22,7 @@ describe('countCharacters (spec 001, definition of «carácter»)', () => {
   });
 
   it('counts after NFC: a decomposed accent counts as one character', () => {
-    const decomposed = 'é'; // e + combining acute accent
+    const decomposed = 'e\u0301'; // e + combining acute accent
     expect(countCharacters(decomposed)).toBe(1);
   });
 

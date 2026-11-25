@@ -44,7 +44,7 @@ describe('PasswordHasher (ADR-0008)', () => {
 
   describe('RF-39: canonically equivalent passwords are the same password', () => {
     const composed = 'contraseña segura'; // ñ as one code point (NFC)
-    const decomposed = 'contraseña segura'; // n + combining tilde (NFD)
+    const decomposed = 'contrasen\u0303a segura'; // n + combining tilde (NFD)
 
     it('verifies a password typed in NFD against one stored in NFC', async () => {
       expect(composed).not.toBe(decomposed);

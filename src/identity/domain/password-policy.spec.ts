@@ -17,7 +17,7 @@ describe('checkPassword', () => {
     });
 
     it('counts characters after NFC: 12 composed letters are 12 even if typed decomposed', () => {
-      const decomposed = 'ñ'.repeat(12); // 12 × ñ in NFD = 24 code points
+      const decomposed = 'n\u0303'.repeat(12); // 12 × ñ in NFD = 24 code points
       expect(check(decomposed)).toBeNull();
     });
 
@@ -34,7 +34,7 @@ describe('checkPassword', () => {
     });
 
     it('RF-39: also when typed in another canonical form', () => {
-      expect(check('contraseña123')).toBe('BREACHED_PASSWORD');
+      expect(check('contrasen\u0303a123')).toBe('BREACHED_PASSWORD');
     });
 
     it('checks the length first: a short listed password is a length problem', () => {
@@ -49,7 +49,7 @@ describe('checkPassword', () => {
       ['only digits', '12345678901234'],
       ['spaces, also at both ends', '  una frase con espacios  '],
       ['emojis and symbols', '🏠🔑 mi casa €¿¡'],
-      ['tabs and other whitespace', 'a\tb c　defghij'],
+      ['tabs and other whitespace', 'a\tb\u00a0c\u3000defghij'],
     ])('accepts %s', (_case, password) => {
       expect(check(password)).toBeNull();
     });
