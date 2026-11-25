@@ -55,8 +55,16 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       # Fresh, throwaway auth secrets for this run (ADR-0008); never stored.
+      # Values written to $GITHUB_ENV are not masked by GitHub: mask each one first,
+      # so they do not appear in the logs of later steps.
       - name: Generate auth secrets
-        run: node scripts/generate-secrets.ts >> "$GITHUB_ENV"
+        run: |
+          node scripts/generate-secrets.ts > "$RUNNER_TEMP/auth-secrets.env"
+          while IFS= read -r line; do
+            echo "::add-mask::${line#*=}"
+          done < "$RUNNER_TEMP/auth-secrets.env"
+          cat "$RUNNER_TEMP/auth-secrets.env" >> "$GITHUB_ENV"
+          rm "$RUNNER_TEMP/auth-secrets.env"
 
       - name: Typecheck
         run: pnpm typecheck
