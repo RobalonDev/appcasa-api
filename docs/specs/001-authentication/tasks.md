@@ -106,7 +106,7 @@ Los RF con parte unitaria y parte e2e se cierran en la entrega donde existe su r
   - Plan: §Flujos (Cerrar sesión; Guard global); decisión Q2.
   - Ficheros: `sessions.controller.ts`, `sessions.service.ts`, `test/identity/sign-out.e2e-spec.ts`.
   - Hecho cuando: e2e `RF-18` (también con el JWT caducado), `RF-19` (las posteriores siguen), `RF-36` (cerrar con un refresh ya usado), `RNF-4` (tras cerrar, el JWT vale ≤ 5 min y el refresh deja de servir al momento) y `RNF-1` (todas las rutas del módulo sin credencial → 401 salvo las públicas) en verde; `pnpm check` y `pnpm test:e2e` pasan.
-- [ ] **T18. Límites bajo concurrencia.** RNF-3 · Responsable: claude
+- [x] **T18. Límites bajo concurrencia.** RNF-3 · Responsable: claude
   - Plan: §Flujos (Límites); ADR-0010, ADR-0013.
   - Ficheros: `test/identity/concurrency.e2e-spec.ts`.
   - Hecho cuando: e2e `RNF-3` (ráfagas simultáneas contra RF-10, RF-12, RF-15 y RF-22: nunca se supera el límite) en verde; `pnpm test:e2e` pasa.
