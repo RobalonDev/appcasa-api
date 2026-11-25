@@ -83,7 +83,7 @@ Los RF con parte unitaria y parte e2e se cierran en la entrega donde existe su r
   - Plan: §Flujos (Guard global); §Modelo de datos (`Session`, `RefreshToken`); ADR-0012.
   - Ficheros: `src/identity/sessions.service.ts` (crear sesión + refresh + JWT), `access-token.guard.ts`, `current-session.decorator.ts`, `health.controller.ts` (`@Public()`), ruta de test `GET /__test/session`, `test/identity/guard.e2e-spec.ts`.
   - Hecho cuando: e2e `RF-33` (sin token, manipulado, otro algoritmo, caducado → `401 AUTHENTICATION_REQUIRED`), `/health` sin token → 200 y `RNF-1` para las rutas existentes en verde; `pnpm check` y `pnpm test:e2e` pasan.
-- [ ] **T13. Completar el registro: validación y evaluación del código.** RF-9, RF-10, RF-11, RF-15, RF-16, RF-23, RF-24, RF-27, RF-28, RF-35, RF-37, RF-41 · Responsable: claude
+- [x] **T13. Completar el registro: validación y evaluación del código.** RF-9, RF-10, RF-11, RF-15, RF-16, RF-23, RF-24, RF-27, RF-28, RF-35, RF-37, RF-41 · Responsable: claude
   - Plan: §Flujos (Completar el registro, pasos 1–5; Términos); decisión Q3.
   - Ficheros: `registration.service.ts`, `registration.controller.ts`, `test/identity/registration-complete.e2e-spec.ts`.
   - Hecho cuando: e2e `RF-37` (solo `INVALID_EMAIL`, también con contraseña ausente), `RF-28` (el código sigue y no cuenta), `RF-23`/`RF-24`/`RF-27`/`RF-35` por HTTP, `RF-9` (bordes de 15 min), `RF-10` (4 fallos aún sirve; 5 no), `RF-11` (el anterior ya no sirve), `RF-15` (bordes de 24 h), `RF-16` (todos los casos, incluidos vacío, 5 dígitos, letras y ausente) y `RF-41` en verde; `pnpm check` y `pnpm test:e2e` pasan.

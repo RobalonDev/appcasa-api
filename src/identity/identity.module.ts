@@ -6,7 +6,9 @@ import type { Env } from '../config/env.js';
 import { MailModule } from '../mail/mail.module.js';
 import { AccessTokenGuard } from './access-token.guard.js';
 import { AuthEmailJobs, InMemoryAuthEmailJobs } from './auth-email-jobs.js';
+import { PasswordHasher } from './crypto/password-hasher.js';
 import { TokensService } from './crypto/tokens.service.js';
+import { BUNDLED_LIST, LeakedPasswords } from './domain/leaked-passwords.js';
 import { RegistrationEmailJob } from './registration-email.job.js';
 import { RegistrationController } from './registration.controller.js';
 import { RegistrationService } from './registration.service.js';
@@ -23,6 +25,12 @@ import { SessionsService } from './sessions.service.js';
     RegistrationService,
     RegistrationEmailJob,
     SessionsService,
+    { provide: PasswordHasher, useFactory: () => new PasswordHasher() },
+    // Loaded once at startup: the check never needs the network (RNF-5).
+    {
+      provide: LeakedPasswords,
+      useFactory: () => LeakedPasswords.fromFile(BUNDLED_LIST),
+    },
     // Deny by default: every route of every module needs a session (ADR-0012, RNF-1).
     { provide: APP_GUARD, useClass: AccessTokenGuard },
     { provide: AuthEmailJobs, useClass: InMemoryAuthEmailJobs },

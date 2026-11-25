@@ -2,20 +2,19 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Clock } from '../clock/clock.js';
 import { lockKey } from '../database/lock-key.js';
 import { PrismaService } from '../database/prisma.service.js';
-import type { Prisma } from '../generated/prisma/client.js';
 import { MailSender, type MailMessage } from '../mail/mail-sender.js';
 import {
   registrationAttemptEmail,
   verificationCodeEmail,
 } from './auth-emails.js';
 import { TokensService } from './crypto/tokens.service.js';
-import { lockedUntil, VERIFICATION_LOCKOUT } from './domain/attempt-window.js';
 import {
   EMAIL_LIMIT_LOOKBACK_MS,
   mayEmail,
 } from './domain/email-send-limit.js';
 import { generateVerificationCode } from './domain/verification-code.js';
 import { EMAIL_LOCK } from './email-lock.js';
+import { isVerificationLocked } from './verification-lock.js';
 
 interface Reservation {
   sendId: string;
@@ -71,7 +70,7 @@ export class RegistrationEmailJob {
       await lockKey(tx, EMAIL_LOCK, email);
       const now = this.clock.now();
 
-      if (await this.isVerificationLocked(tx, email, now)) {
+      if (await isVerificationLocked(tx, email, now)) {
         return null;
       }
       const recentSends = await tx.authEmailSend.findMany({
@@ -144,7 +143,7 @@ export class RegistrationEmailJob {
       }
 
       const hasAccount = (await tx.user.count({ where: { email } })) > 0;
-      if (hasAccount || (await this.isVerificationLocked(tx, email, now))) {
+      if (hasAccount || (await isVerificationLocked(tx, email, now))) {
         await tx.verificationCode.update({
           where: { id: reservation.codeId },
           data: { status: 'INVALIDATED' },
@@ -177,24 +176,5 @@ export class RegistrationEmailJob {
         await tx.verificationCode.delete({ where: { id: reservation.codeId } });
       }
     });
-  }
-
-  /** RF-15: whether too many failed verifications currently lock this email's codes. */
-  private async isVerificationLocked(
-    tx: Prisma.TransactionClient,
-    email: string,
-    now: Date,
-  ): Promise<boolean> {
-    const lookback =
-      VERIFICATION_LOCKOUT.windowMs + VERIFICATION_LOCKOUT.lockMs;
-    const failures = await tx.verificationFailure.findMany({
-      where: { email, failedAt: { gt: new Date(now.getTime() - lookback) } },
-      select: { failedAt: true },
-    });
-    const attempts = failures.map((f) => ({
-      at: f.failedAt,
-      outcome: 'FAILURE' as const,
-    }));
-    return lockedUntil(attempts, VERIFICATION_LOCKOUT, now) !== null;
   }
 }

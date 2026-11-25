@@ -23,4 +23,15 @@ export class RegistrationController {
   ): void {
     this.registration.requestRegistration(body.email);
   }
+
+  /**
+   * Step 2 of registration (RF-4…RF-41). The body is validated by the service, not by a
+   * schema, to follow the order of RF-37 and map every problem to the spec (plan Q3).
+   */
+  @Public()
+  @Post('registrations')
+  @HttpCode(HttpStatus.CREATED)
+  async completeRegistration(@Body() body: unknown): Promise<void> {
+    await this.registration.completeRegistration(body);
+  }
 }
