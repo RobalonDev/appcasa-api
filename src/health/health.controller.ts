@@ -5,12 +5,15 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service.js';
+import { Public } from '../http/public.decorator.js';
 
 export interface HealthStatus {
   status: 'ok';
   database: 'up';
 }
 
+// Infrastructure, outside the scope of RNF-1 (spec 001, D21).
+@Public()
 @Controller('health')
 export class HealthController {
   private readonly logger = new Logger(HealthController.name);

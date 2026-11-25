@@ -79,7 +79,7 @@ Los RF con parte unitaria y parte e2e se cierran en la entrega donde existe su r
   - Plan: §Flujos (Normalización).
   - Ficheros: `src/identity/domain/display-name.ts` (+ `.spec.ts`).
   - Hecho cuando: tests unitarios `RF-27` (1/31 caracteres, control, formato, separadores, uso privado, sin asignar; tabulador en extremos eliminado y en medio rechazado) en verde; `pnpm check` pasa.
-- [ ] **T12. Creación de sesiones y guard global.** RF-33, RNF-1 · Responsable: claude
+- [x] **T12. Creación de sesiones y guard global.** RF-33, RNF-1 · Responsable: claude
   - Plan: §Flujos (Guard global); §Modelo de datos (`Session`, `RefreshToken`); ADR-0012.
   - Ficheros: `src/identity/sessions.service.ts` (crear sesión + refresh + JWT), `access-token.guard.ts`, `current-session.decorator.ts`, `health.controller.ts` (`@Public()`), ruta de test `GET /__test/session`, `test/identity/guard.e2e-spec.ts`.
   - Hecho cuando: e2e `RF-33` (sin token, manipulado, otro algoritmo, caducado → `401 AUTHENTICATION_REQUIRED`), `/health` sin token → 200 y `RNF-1` para las rutas existentes en verde; `pnpm check` y `pnpm test:e2e` pasan.

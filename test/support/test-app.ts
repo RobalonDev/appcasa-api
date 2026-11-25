@@ -5,6 +5,7 @@ import type { App } from 'supertest/types.js';
 import { AppModule } from '../../src/app.module.js';
 import { PrismaService } from '../../src/database/prisma.service.js';
 import { configureApp } from '../../src/http/configure-app.js';
+import { TestRoutesModule } from './test-routes.module.js';
 
 export interface TestApp {
   app: INestApplication<App>;
@@ -13,14 +14,15 @@ export interface TestApp {
 
 /**
  * Boots the real application for e2e tests, configured exactly like `main.ts`
- * (ADR-0012). `override` lets a test swap providers (clock, mail sender…).
+ * (ADR-0012), plus the test-only routes of `TestRoutesModule`.
+ * `override` lets a test swap providers (clock, mail sender…).
  * Requires the local database with migrations applied: `pnpm infra:up && pnpm db:migrate`.
  */
 export async function createTestApp(
   override: (builder: TestingModuleBuilder) => TestingModuleBuilder = (b) => b,
 ): Promise<TestApp> {
   const moduleRef = await override(
-    Test.createTestingModule({ imports: [AppModule] }),
+    Test.createTestingModule({ imports: [AppModule, TestRoutesModule] }),
   ).compile();
   const app = moduleRef.createNestApplication<INestApplication<App>>();
   configureApp(app);
